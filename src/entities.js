@@ -274,7 +274,7 @@
     const yawInput = (input.keys.KeyQ ? 1 : 0) - (input.keys.KeyE ? 1 : 0);
     const throttleInput = (input.keys.ShiftLeft || input.keys.ShiftRight ? 1 : 0) - (input.keys.ControlLeft || input.keys.ControlRight ? 1 : 0);
     const verticalInput = (input.keys.ArrowUp ? 1 : 0) - (input.keys.ArrowDown ? 1 : 0);
-    const lateralInput = (input.keys.ArrowRight ? 1 : 0) - (input.keys.ArrowLeft ? 1 : 0);
+    const turnInput = (input.keys.ArrowRight ? 1 : 0) - (input.keys.ArrowLeft ? 1 : 0);
 
     player.pitch = Math3D.clamp(player.pitch + pitchInput * dt * 0.9, -0.62, 0.62);
     player.roll = Math3D.clamp(player.roll + rollInput * dt * 1.8, -1.15, 1.15);
@@ -282,18 +282,18 @@
       player.roll = Math3D.lerp(player.roll, 0, dt * 1.8);
     }
 
-    player.yaw = Math3D.wrapAngle(player.yaw + (yawInput * 0.95 - player.roll * 0.48) * dt);
+    const totalYawInput = yawInput + turnInput;
+    player.yaw = Math3D.wrapAngle(player.yaw + (totalYawInput * 0.95 - player.roll * 0.48) * dt);
     player.speed = Math3D.clamp(player.speed + throttleInput * 92 * dt, CONFIG.player.minSpeed, CONFIG.player.maxSpeed);
 
     const basis = Math3D.basisFromAngles(player.pitch, player.yaw, player.roll);
-    const flatRight = Math3D.normalize({ x: basis.right.x, y: 0, z: basis.right.z });
-    player.strafeVelocity = Math3D.lerp(player.strafeVelocity, lateralInput * CONFIG.player.strafeSpeed, dt * 4.2);
+    player.strafeVelocity = Math3D.lerp(player.strafeVelocity, 0, dt * 5.5);
     player.liftVelocity = Math3D.lerp(player.liftVelocity, verticalInput * CONFIG.player.verticalSpeed, dt * 4.2);
 
     let movement = Math3D.add(
       Math3D.scale(basis.forward, player.speed),
       Math3D.add(
-        Math3D.scale(flatRight, player.strafeVelocity),
+        Math3D.scale(basis.right, player.strafeVelocity),
         { x: 0, y: player.liftVelocity, z: 0 }
       )
     );
