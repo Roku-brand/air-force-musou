@@ -49,6 +49,116 @@ button {
   background: linear-gradient(180deg, #315d93 0%, #09131d 76%);
 }
 
+
+
+body.menu-active #game-canvas,
+body.menu-active #hud {
+  display: none;
+}
+
+#menu-overlay {
+  z-index: 30;
+  padding: 0;
+  background:
+    radial-gradient(circle at 20% 10%, rgba(121, 224, 255, 0.2), transparent 30%),
+    radial-gradient(circle at 80% 20%, rgba(255, 225, 123, 0.18), transparent 34%),
+    linear-gradient(180deg, #08131f 0%, #040a10 100%);
+}
+
+.top-page-panel {
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
+  padding: clamp(12px, 2.2vh, 22px) clamp(14px, 2.8vw, 34px);
+  gap: clamp(10px, 1.5vh, 16px);
+  grid-template-rows: auto auto auto auto 1fr;
+  align-content: start;
+  background: transparent;
+}
+
+.menu-tab-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.menu-tab-button {
+  border: 1px solid rgba(121, 224, 255, 0.35);
+  background: rgba(5, 19, 33, 0.78);
+  color: var(--text);
+  min-height: 42px;
+}
+
+.menu-tab-active {
+  border-color: rgba(255, 225, 123, 0.55);
+  background: rgba(255, 225, 123, 0.12);
+}
+
+.menu-section {
+  height: 100%;
+  overflow: hidden;
+}
+
+#menu-tab-stage .stage-cards {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.compact-controls-grid div {
+  padding: 8px 10px;
+  font-size: 13px;
+}
+
+@media (max-width: 900px) {
+  .top-page-panel {
+    grid-template-rows: auto auto auto auto 1fr;
+    padding: 10px;
+  }
+
+  .lead {
+    font-size: 14px;
+    line-height: 1.45;
+    margin: 0;
+  }
+
+  .hero-panel h1 {
+    font-size: clamp(28px, 8vw, 42px);
+  }
+
+  #menu-tab-stage .stage-cards {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .menu-section {
+    padding: 10px;
+  }
+
+  .stage-card h3 {
+    font-size: 18px;
+    margin-bottom: 4px;
+  }
+
+  .stage-card p,
+  .menu-note,
+  .compact-controls-grid div {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .setting-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .menu-tab-button {
+    min-height: 34px;
+    font-size: 12px;
+  }
+}
+
 .hud,
 .overlay {
   position: absolute;
@@ -346,6 +456,64 @@ button {
 .hero-panel {
   display: grid;
   gap: 18px;
+}
+
+.menu-sections {
+  display: grid;
+  gap: 14px;
+}
+
+.menu-section {
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 14px;
+}
+
+.menu-section h2 {
+  margin: 0 0 10px;
+  font-size: 18px;
+}
+
+.setting-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.menu-field {
+  display: grid;
+  gap: 6px;
+  color: #d7edf6;
+}
+
+.menu-field span {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: #b3d0dd;
+}
+
+.menu-field select,
+.menu-field input[type="range"] {
+  width: 100%;
+  background: rgba(4, 14, 25, 0.9);
+  color: var(--text);
+  border: 1px solid rgba(121, 224, 255, 0.3);
+  padding: 8px;
+}
+
+.checkbox-field {
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 8px;
+}
+
+.menu-note {
+  margin: 0;
+  padding: 10px;
+  border: 1px solid rgba(121, 224, 255, 0.22);
+  color: #d1e7f1;
+  background: rgba(5, 16, 29, 0.6);
+  grid-column: 1 / -1;
 }
 
 .hero-panel h1,
