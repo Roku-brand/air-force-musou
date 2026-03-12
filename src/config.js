@@ -10,22 +10,19 @@
   ];
 
   const stage2Enemies = [
-    { kind: "fighter", name: "迎撃機 ランス1", x: -980, y: 320, z: 1280, yaw: 3.1 },
-    { kind: "fighter", name: "迎撃機 ランス2", x: -520, y: 300, z: 1120, yaw: 3.0 },
-    { kind: "fighter", name: "迎撃機 ランス3", x: 520, y: 300, z: 1120, yaw: 3.2 },
-    { kind: "fighter", name: "迎撃機 ランス4", x: 980, y: 320, z: 1280, yaw: 3.2 },
-    { kind: "fighter", name: "迎撃機 ランス5", x: -260, y: 360, z: 1680, yaw: 3.12 },
-    { kind: "fighter", name: "迎撃機 ランス6", x: 260, y: 360, z: 1680, yaw: 3.08 }
+    { kind: "battleship", name: "重巡洋艦 ヴォルカ", x: -860, y: 0, z: 1080, yaw: 3.14 },
+    { kind: "battleship", name: "重巡洋艦 ネーレウス", x: 860, y: 0, z: 1080, yaw: 3.14 },
+    { kind: "battleship", name: "駆逐艦 ストーム", x: -340, y: 0, z: 1420, yaw: 3.14 },
+    { kind: "battleship", name: "駆逐艦 ガスト", x: 340, y: 0, z: 1420, yaw: 3.14 },
+    { kind: "flagship", name: "旗艦 リヴァイアサン", x: 0, y: 0, z: 1880, yaw: 3.14 }
   ];
 
   const stage3Enemies = [
-    { kind: "fighter", name: "防空機 タロン1", x: -1240, y: 420, z: 1520, yaw: 3.05 },
-    { kind: "fighter", name: "防空機 タロン2", x: 1240, y: 420, z: 1520, yaw: 3.25 },
-    { kind: "fighter", name: "防空機 タロン3", x: -580, y: 360, z: 1320, yaw: 3.05 },
-    { kind: "fighter", name: "防空機 タロン4", x: 580, y: 360, z: 1320, yaw: 3.2 },
-    { kind: "fighter", name: "防空機 タロン5", x: -220, y: 440, z: 1980, yaw: 3.12 },
-    { kind: "fighter", name: "防空機 タロン6", x: 220, y: 440, z: 1980, yaw: 3.08 },
-    { kind: "fighter", name: "防空機 タロン7", x: 0, y: 500, z: 2320, yaw: 3.14 }
+    { kind: "sam", name: "防空砲台 オービットL", x: -740, y: 0, z: 1260, yaw: 3.1 },
+    { kind: "sam", name: "防空砲台 オービットR", x: 740, y: 0, z: 1260, yaw: 3.18 },
+    { kind: "sam", name: "防空砲台 ヘリオスL", x: -420, y: 0, z: 1680, yaw: 3.1 },
+    { kind: "sam", name: "防空砲台 ヘリオスR", x: 420, y: 0, z: 1680, yaw: 3.18 },
+    { kind: "hq", name: "軍事基地 アイアンドーム", x: 0, y: 0, z: 2180, yaw: 3.14 }
   ];
 
   SkyDominion.CONFIG = {
@@ -85,8 +82,8 @@
         id: "harbor-spear",
         name: "ステージ2 / 港湾強襲",
         shortName: "港湾強襲",
-        objective: "広域哨戒中の迎撃飛行隊を殲滅せよ",
-        completionLabel: "迎撃飛行隊壊滅",
+        objective: "敵艦隊を壊滅させ制海権を奪取せよ",
+        completionLabel: "敵艦隊壊滅",
         environment: {
           skyTop: "#83a8d7",
           skyBottom: "#f0d099",
@@ -102,10 +99,10 @@
       },
       {
         id: "mountain-crown",
-        name: "ステージ3 / 山岳司令部",
-        shortName: "山岳司令部",
-        objective: "最終防衛飛行隊を撃破し制空権を確保せよ",
-        completionLabel: "最終防衛飛行隊壊滅",
+        name: "ステージ3 / 軍事基地制圧",
+        shortName: "軍事基地制圧",
+        objective: "山岳地帯の軍事基地を制圧し作戦を完遂せよ",
+        completionLabel: "軍事基地の無力化",
         environment: {
           skyTop: "#95a2d3",
           skyBottom: "#edb386",
