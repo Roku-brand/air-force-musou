@@ -29,7 +29,10 @@
     messageSecondary: document.getElementById("message-secondary"),
     startButton: document.getElementById("start-button"),
     stageCards: document.getElementById("stage-cards"),
-    radarCanvas: document.getElementById("radar-canvas")
+    radarCanvas: document.getElementById("radar-canvas"),
+    touchControls: document.getElementById("touch-controls"),
+    touchStickFlight: document.getElementById("touch-stick-flight"),
+    touchStickMove: document.getElementById("touch-stick-move")
   };
 
   const game = {
@@ -48,7 +51,15 @@
     },
     input: {
       keys: {},
-      fireQueued: false
+      keyboardKeys: {},
+      virtualKeys: {},
+      fireQueued: false,
+      touch: {
+        enabled: false,
+        activeButtons: {},
+        flightStick: null,
+        moveStick: null
+      }
     },
     uiActions: {
       primary: function () {},
@@ -108,6 +119,8 @@
     game.feedback.hitFlash = 0;
     game.input.fireQueued = false;
     game.input.keys = {};
+    game.input.keyboardKeys = {};
+    game.input.virtualKeys = {};
     dom.hud.classList.remove("hidden");
     updateHud();
   }
@@ -272,8 +285,166 @@
     ctx.fill();
   }
 
+
+  function setVirtualKey(code, pressed) {
+    game.input.virtualKeys[code] = !!pressed;
+  }
+
+  function updateCombinedKeys() {
+    const keys = {};
+    Object.keys(game.input.keyboardKeys).forEach(function (code) {
+      if (game.input.keyboardKeys[code]) {
+        keys[code] = true;
+      }
+    });
+    Object.keys(game.input.virtualKeys).forEach(function (code) {
+      if (game.input.virtualKeys[code]) {
+        keys[code] = true;
+      }
+    });
+    game.input.keys = keys;
+  }
+
+  function updateStickVisual(stick) {
+    if (!stick || !stick.element) {
+      return;
+    }
+    const knob = stick.element.querySelector(".touch-stick-knob");
+    if (!knob) {
+      return;
+    }
+    const move = 30;
+    knob.style.transform = "translate(" + (stick.x * move).toFixed(1) + "px, " + (stick.y * move).toFixed(1) + "px)";
+  }
+
+  function setStickFromPointer(stick, event) {
+    const rect = stick.element.getBoundingClientRect();
+    const cx = rect.left + rect.width * 0.5;
+    const cy = rect.top + rect.height * 0.5;
+    const maxDistance = rect.width * 0.4;
+    let dx = event.clientX - cx;
+    let dy = event.clientY - cy;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist > maxDistance && dist > 0) {
+      const ratio = maxDistance / dist;
+      dx *= ratio;
+      dy *= ratio;
+    }
+    stick.x = Math3D.clamp(dx / maxDistance, -1, 1);
+    stick.y = Math3D.clamp(dy / maxDistance, -1, 1);
+    updateStickVisual(stick);
+  }
+
+  function resetStick(stick) {
+    stick.pointerId = null;
+    stick.x = 0;
+    stick.y = 0;
+    updateStickVisual(stick);
+  }
+
+  function applyTouchKeys() {
+    const touch = game.input.touch;
+    if (!touch.enabled) {
+      return;
+    }
+    const threshold = 0.32;
+    const flight = touch.flightStick;
+    const move = touch.moveStick;
+
+    setVirtualKey("KeyW", flight.y < -threshold);
+    setVirtualKey("KeyS", flight.y > threshold);
+    setVirtualKey("KeyQ", flight.x < -threshold);
+    setVirtualKey("KeyE", flight.x > threshold);
+
+    setVirtualKey("ArrowLeft", move.x < -threshold);
+    setVirtualKey("ArrowRight", move.x > threshold);
+    setVirtualKey("ArrowUp", move.y < -threshold);
+    setVirtualKey("ArrowDown", move.y > threshold);
+  }
+
+  function bindTouchButton(button) {
+    const key = button.dataset.key;
+    const isFire = button.dataset.fire === "true";
+
+    function activate() {
+      if (key) {
+        game.input.touch.activeButtons[key] = true;
+        setVirtualKey(key, true);
+      }
+      if (isFire) {
+        game.input.fireQueued = true;
+      }
+      button.classList.add("touch-button-active");
+    }
+
+    function deactivate() {
+      if (key) {
+        delete game.input.touch.activeButtons[key];
+        setVirtualKey(key, false);
+      }
+      button.classList.remove("touch-button-active");
+    }
+
+    button.addEventListener("pointerdown", function (event) {
+      event.preventDefault();
+      activate();
+    });
+
+    ["pointerup", "pointercancel", "pointerleave"].forEach(function (type) {
+      button.addEventListener(type, function (event) {
+        event.preventDefault();
+        deactivate();
+      });
+    });
+  }
+
+  function bindTouchStick(stick) {
+    const element = stick.element;
+    element.addEventListener("pointerdown", function (event) {
+      event.preventDefault();
+      stick.pointerId = event.pointerId;
+      setStickFromPointer(stick, event);
+      element.setPointerCapture(event.pointerId);
+    });
+
+    element.addEventListener("pointermove", function (event) {
+      if (stick.pointerId !== event.pointerId) {
+        return;
+      }
+      event.preventDefault();
+      setStickFromPointer(stick, event);
+    });
+
+    ["pointerup", "pointercancel"].forEach(function (type) {
+      element.addEventListener(type, function (event) {
+        if (stick.pointerId !== event.pointerId) {
+          return;
+        }
+        event.preventDefault();
+        resetStick(stick);
+      });
+    });
+  }
+
+  function setupTouchControls() {
+    const isTouch = window.matchMedia("(pointer: coarse)").matches;
+    game.input.touch.enabled = isTouch;
+    dom.touchControls.style.display = isTouch ? "flex" : "none";
+    if (!isTouch) {
+      return;
+    }
+
+    game.input.touch.flightStick = { element: dom.touchStickFlight, pointerId: null, x: 0, y: 0 };
+    game.input.touch.moveStick = { element: dom.touchStickMove, pointerId: null, x: 0, y: 0 };
+
+    bindTouchStick(game.input.touch.flightStick);
+    bindTouchStick(game.input.touch.moveStick);
+
+    dom.touchControls.querySelectorAll(".touch-button").forEach(bindTouchButton);
+  }
+
   function onKeyDown(event) {
-    game.input.keys[event.code] = true;
+    game.input.keyboardKeys[event.code] = true;
     if (event.code === "Space" || event.code.indexOf("Arrow") === 0) {
       event.preventDefault();
     }
@@ -294,7 +465,7 @@
   }
 
   function onKeyUp(event) {
-    game.input.keys[event.code] = false;
+    game.input.keyboardKeys[event.code] = false;
   }
 
   function tick(timestamp) {
@@ -305,6 +476,9 @@
     game.lastFrameTime = timestamp;
     game.clock += dt;
     game.feedback.hitFlash = Math.max(0, game.feedback.hitFlash - dt);
+
+    applyTouchKeys();
+    updateCombinedKeys();
 
     if (game.state === "playing") {
       if (game.input.fireQueued) {
@@ -344,6 +518,8 @@
     window.addEventListener("resize", function () {
       game.renderer.resize();
     });
+
+    setupTouchControls();
 
     dom.hud.classList.add("hidden");
     setMenuVisible(true);
