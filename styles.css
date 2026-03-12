@@ -102,6 +102,12 @@ body.menu-active #hud {
   overflow: hidden;
 }
 
+#menu-tab-stage {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 #menu-tab-stage .stage-cards {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
@@ -127,25 +133,52 @@ body.menu-active #hud {
     font-size: clamp(28px, 8vw, 42px);
   }
 
+  #menu-tab-stage {
+    gap: 6px;
+  }
+
   #menu-tab-stage .stage-cards {
     grid-template-columns: 1fr;
-    gap: 8px;
+    grid-template-rows: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    height: 100%;
   }
 
   .menu-section {
-    padding: 10px;
+    padding: 8px;
+  }
+
+  .stage-card {
+    padding: 8px 10px;
   }
 
   .stage-card h3 {
-    font-size: 18px;
-    margin-bottom: 4px;
+    font-size: 16px;
+    margin-bottom: 3px;
   }
 
   .stage-card p,
   .menu-note,
   .compact-controls-grid div {
-    font-size: 12px;
-    line-height: 1.4;
+    font-size: 11px;
+    line-height: 1.3;
+  }
+
+  .stage-card p {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .stage-card .stage-tag {
+    margin-top: 6px;
+    padding: 3px 7px;
+    font-size: 10px;
+  }
+
+  #menu-tab-stage .menu-note {
+    display: none;
   }
 
   .setting-grid {
@@ -185,6 +218,10 @@ body.menu-active #hud {
   align-items: flex-start;
 }
 
+.hud-top {
+  position: relative;
+}
+
 .hud-block,
 .radar-panel,
 .telemetry-panel,
@@ -204,9 +241,29 @@ body.menu-active #hud {
   text-align: right;
 }
 
-.hud-block-compact {
+.status-item-mission {
+  display: block;
+}
+
+.status-item-mission .status-value {
+  display: block;
+  margin-top: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lock-panel {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  min-width: 250px;
+  text-align: center;
+}
+
+.instrument-panel {
   min-width: 210px;
-  max-width: 320px;
 }
 
 .status-strip {
@@ -358,6 +415,10 @@ body.menu-active #hud {
   font-size: 18px;
 }
 
+.instrument-panel .telemetry-row {
+  padding: 6px 0;
+}
+
 
 .touch-controls {
   position: absolute;
@@ -368,11 +429,13 @@ body.menu-active #hud {
   align-items: flex-end;
   justify-content: space-between;
   gap: 10px;
+  padding: 0 12px 0 clamp(28px, 7vw, 80px);
   pointer-events: none;
 }
 
 .touch-stick {
   width: min(34vw, 158px);
+  margin-left: clamp(14px, 4vw, 44px);
   height: min(34vw, 158px);
   border-radius: 50%;
   border: 1px solid rgba(121, 224, 255, 0.34);
@@ -429,13 +492,21 @@ body.menu-active #hud {
 }
 
 .touch-button-fire {
-  min-height: 58px;
-  font-size: 14px;
+  min-height: 62px;
+  font-size: 13px;
   font-weight: 700;
+  border-radius: 26px 26px 10px 10px;
+  background: linear-gradient(180deg, rgba(255, 122, 102, 0.8), rgba(134, 30, 26, 0.78));
+  border-color: rgba(255, 225, 123, 0.45);
+  box-shadow: inset 0 -10px 14px rgba(0, 0, 0, 0.35);
 }
 
 .touch-button-speed {
-  font-size: 13px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(88, 127, 151, 0.95), rgba(31, 54, 70, 0.95));
+  border-color: rgba(173, 226, 255, 0.42);
 }
 .overlay {
   display: none;
@@ -683,6 +754,20 @@ body.menu-active #hud {
   .status-strip {
     min-width: 0;
     width: auto;
+  }
+
+  .lock-panel {
+    min-width: 180px;
+    padding: 8px 10px;
+  }
+
+  .instrument-panel {
+    min-width: 132px;
+    padding: 8px 10px;
+  }
+
+  .instrument-panel .telemetry-row strong {
+    font-size: 15px;
   }
 
   .crosshair {
