@@ -1,0 +1,113 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>空軍無双</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <canvas id="game-canvas" aria-label="3D空戦シミュレーション"></canvas>
+
+    <div class="hud hidden" id="hud">
+      <div class="hud-top">
+        <div class="hud-block">
+          <div class="label">任務</div>
+          <div class="value" id="mission-name">-</div>
+          <div class="sub" id="mission-objective">-</div>
+        </div>
+        <div class="hud-block hud-block-right">
+          <div class="label">ロックオン</div>
+          <div class="value" id="lock-name">ロックなし</div>
+          <div class="sub" id="lock-distance">---</div>
+        </div>
+      </div>
+
+      <div class="hud-center">
+        <div class="crosshair">
+          <span class="crosshair-ring"></span>
+          <span class="crosshair-dot"></span>
+        </div>
+        <div class="hit-flash" id="hit-flash"></div>
+      </div>
+
+      <div class="hud-bottom">
+        <div class="status-panel">
+          <div class="meter">
+            <div class="meter-title">耐久</div>
+            <div class="meter-bar">
+              <div class="meter-fill meter-fill-health" id="health-fill"></div>
+            </div>
+            <div class="meter-value" id="health-text">3 / 3</div>
+          </div>
+          <div class="meter">
+            <div class="meter-title">ミサイル</div>
+            <div class="meter-bar">
+              <div class="meter-fill meter-fill-ammo" id="ammo-fill"></div>
+            </div>
+            <div class="meter-value" id="ammo-text">20 / 20</div>
+          </div>
+        </div>
+
+        <div class="radar-panel">
+          <div class="radar-title">戦術レーダー</div>
+          <canvas id="radar-canvas" width="180" height="180"></canvas>
+        </div>
+
+        <div class="telemetry-panel">
+          <div class="telemetry-row"><span>速度</span><strong id="speed-text">0</strong></div>
+          <div class="telemetry-row"><span>高度</span><strong id="altitude-text">0</strong></div>
+          <div class="telemetry-row"><span>敵影</span><strong id="hostiles-text">0</strong></div>
+          <div class="telemetry-row"><span>進行</span><strong id="stage-text">1 / 3</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="overlay overlay-visible" id="menu-overlay">
+      <div class="panel hero-panel">
+        <div class="eyebrow">三次元 空戦シミュレーション</div>
+        <h1>空軍無双</h1>
+        <p class="lead">
+          3つの作戦空域を突破し、敵戦闘機、戦艦、地対空ミサイル網、司令本部を制圧せよ。
+        </p>
+
+        <div class="controls-grid">
+          <div><span>W / S</span>機首の上下</div>
+          <div><span>A / D</span>機体の左右傾き</div>
+          <div><span>Q / E</span>旋回</div>
+          <div><span>Shift / Ctrl</span>加速 / 減速</div>
+          <div><span>↑ ↓</span>上下移動</div>
+          <div><span>← →</span>左右移動</div>
+          <div><span>Space</span>ミサイル発射</div>
+          <div><span>R / Esc</span>再出撃 / メニュー</div>
+        </div>
+
+        <div class="stage-cards" id="stage-cards"></div>
+
+        <div class="button-row">
+          <button class="action-button" id="start-button">作戦開始</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="overlay" id="message-overlay">
+      <div class="panel message-panel">
+        <div class="eyebrow" id="message-eyebrow">状況更新</div>
+        <h2 id="message-title">出撃準備完了</h2>
+        <p id="message-body">-</p>
+        <div class="button-row">
+          <button class="action-button" id="message-primary">続行</button>
+          <button class="ghost-button" id="message-secondary">ステージ選択</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="./src/config.js"></script>
+  <script src="./src/math.js"></script>
+  <script src="./src/entities.js"></script>
+  <script src="./src/render.js"></script>
+  <script src="./src/game.js"></script>
+</body>
+</html>
