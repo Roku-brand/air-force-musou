@@ -152,6 +152,16 @@ body.menu-active #hud {
     padding: 8px 10px;
   }
 
+  .stage-card-visual {
+    height: 88px;
+    margin-bottom: 8px;
+  }
+
+  .enemy-warship {
+    width: 130px;
+    height: 72px;
+  }
+
   .stage-card h3 {
     font-size: 16px;
     margin-bottom: 3px;
@@ -648,6 +658,125 @@ body.menu-active #hud {
   font-size: 12px;
   border: 1px solid rgba(255, 225, 123, 0.28);
   color: var(--accent-strong);
+}
+
+
+.stage-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.stage-card-visual {
+  width: 100%;
+  height: 114px;
+  margin: -2px 0 12px;
+  border: 1px solid rgba(121, 224, 255, 0.22);
+  background:
+    radial-gradient(circle at 20% 20%, rgba(123, 224, 255, 0.14), transparent 45%),
+    linear-gradient(180deg, rgba(12, 36, 56, 0.65), rgba(4, 14, 24, 0.78));
+  perspective: 620px;
+  transform-style: preserve-3d;
+  position: relative;
+}
+
+.enemy-warship {
+  position: absolute;
+  left: 50%;
+  top: 54%;
+  width: 162px;
+  height: 90px;
+  transform-style: preserve-3d;
+  transform: translate3d(-50%, -50%, 0) rotateX(52deg) rotateZ(-10deg);
+}
+
+.enemy-warship-shadow,
+.enemy-warship-hull,
+.enemy-warship-deck,
+.enemy-warship-bridge,
+.enemy-warship-turret,
+.enemy-warship-rim {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform-style: preserve-3d;
+}
+
+.enemy-warship-shadow {
+  width: 168px;
+  height: 44px;
+  transform: translate3d(-50%, -50%, -20px) rotateX(90deg);
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0));
+  filter: blur(1px);
+}
+
+.enemy-warship-hull {
+  width: 154px;
+  height: 38px;
+  transform: translate(-50%, -50%) translateZ(0);
+  clip-path: polygon(4% 48%, 18% 8%, 84% 8%, 99% 50%, 84% 92%, 18% 92%);
+  background:
+    linear-gradient(180deg, rgba(143, 168, 182, 0.2), rgba(16, 28, 38, 0) 32%),
+    linear-gradient(135deg, #4f6374 0%, #334658 42%, #202f3d 100%);
+  box-shadow: inset -6px -8px 10px rgba(5, 10, 16, 0.34);
+}
+
+.enemy-warship-deck {
+  width: 116px;
+  height: 26px;
+  transform: translate(-50%, -50%) translate3d(0, -3px, 12px);
+  clip-path: polygon(4% 50%, 16% 8%, 82% 10%, 97% 50%, 82% 90%, 16% 92%);
+  background:
+    linear-gradient(180deg, rgba(209, 224, 237, 0.2), rgba(109, 130, 146, 0.16) 42%, rgba(48, 64, 77, 0.8) 100%),
+    repeating-linear-gradient(90deg, rgba(189, 214, 229, 0.1) 0 6px, rgba(36, 51, 62, 0.06) 6px 12px);
+}
+
+.enemy-warship-bridge {
+  width: 26px;
+  height: 22px;
+  transform: translate(-40%, -80%) translate3d(0, -12px, 26px) skewX(-8deg);
+  clip-path: polygon(12% 100%, 0 34%, 34% 0, 88% 0, 100% 34%, 88% 100%);
+  background:
+    linear-gradient(180deg, rgba(212, 229, 241, 0.42), rgba(57, 78, 94, 0.9) 78%),
+    linear-gradient(145deg, rgba(132, 211, 255, 0.35), rgba(16, 27, 36, 0));
+  box-shadow: inset -4px -4px 8px rgba(4, 9, 14, 0.3);
+}
+
+.enemy-warship-turret {
+  width: 18px;
+  height: 16px;
+  transform: translate(-50%, -50%) translateZ(23px);
+  clip-path: polygon(16% 100%, 0 52%, 14% 8%, 84% 8%, 100% 52%, 84% 100%);
+  background: linear-gradient(160deg, #8ca5b6 0%, #597182 45%, #334351 100%);
+}
+
+.enemy-warship-turret::after {
+  content: "";
+  position: absolute;
+  left: 42%;
+  top: -10px;
+  width: 4px;
+  height: 12px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #9db8c8, #30414f);
+  box-shadow: 8px 0 0 0 rgba(107, 130, 145, 0.95);
+}
+
+.enemy-warship-turret-front {
+  transform: translate(-138%, -42%) translateZ(22px);
+}
+
+.enemy-warship-turret-mid {
+  transform: translate(-18%, -50%) translateZ(22px);
+}
+
+.enemy-warship-rim {
+  width: 124px;
+  height: 24px;
+  transform: translate(-48%, -54%) translate3d(0, -4px, 13px);
+  clip-path: polygon(2% 50%, 14% 12%, 84% 12%, 98% 50%, 84% 88%, 14% 88%);
+  border: 1px solid rgba(166, 236, 255, 0.3);
+  background: linear-gradient(180deg, rgba(165, 229, 255, 0.16), rgba(0, 0, 0, 0));
+  mix-blend-mode: screen;
 }
 
 .button-row {
