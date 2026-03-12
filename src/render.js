@@ -274,12 +274,12 @@
     const terrain = stage.environment.terrainType;
 
     if (terrain === "archipelago") {
-      meshes.push(createPyramidMesh(-640, 0, 1020, 280, 92, ["#6f684f", "#897e5c", "#817654", "#6d6346", "#5e563d"]));
-      meshes.push(createPyramidMesh(620, 0, 1260, 320, 108, ["#6b6554", "#867e68", "#7a735e", "#665f4f", "#5a5344"]));
-      meshes.push(createPyramidMesh(80, 0, 1650, 420, 128, ["#4e624a", "#68825e", "#5b7552", "#4e6748", "#40563b"]));
-      clouds.push({ x: -420, y: 360, z: 520, size: 70 });
-      clouds.push({ x: 260, y: 410, z: 910, size: 84 });
-      clouds.push({ x: 20, y: 340, z: 1340, size: 92 });
+      meshes.push(createPyramidMesh(-1100, 0, 1620, 420, 128, ["#6f684f", "#897e5c", "#817654", "#6d6346", "#5e563d"]));
+      meshes.push(createPyramidMesh(980, 0, 1880, 460, 146, ["#6b6554", "#867e68", "#7a735e", "#665f4f", "#5a5344"]));
+      meshes.push(createPyramidMesh(160, 0, 2460, 620, 188, ["#4e624a", "#68825e", "#5b7552", "#4e6748", "#40563b"]));
+      clouds.push({ x: -620, y: 420, z: 960, size: 90 });
+      clouds.push({ x: 420, y: 460, z: 1540, size: 104 });
+      clouds.push({ x: 80, y: 380, z: 2240, size: 126 });
     }
 
     if (terrain === "harbor") {
@@ -334,7 +334,8 @@
     }
 
     function buildCamera(player) {
-      const basis = Math3D.basisFromAngles(player.pitch * 0.92, player.yaw, player.roll * 0.65);
+      const lookPitch = player.pitch * 0.92 + (player.cameraPitchBias || 0);
+      const basis = Math3D.basisFromAngles(lookPitch, player.yaw, player.roll * 0.65);
       const pos = Math3D.add(
         Math3D.sub(player.pos, Math3D.scale(basis.forward, CONFIG.camera.chaseDistance)),
         Math3D.scale(basis.up, CONFIG.camera.chaseHeight)
@@ -370,10 +371,12 @@
       };
     }
 
-    function drawSky(environment, player) {
+    function drawSky(environment, player, camera) {
+      const look = Math3D.clamp(camera.forward.y, -0.95, 0.95);
+      const horizonRatio = Math3D.clamp(0.52 - look * 0.38, 0.14, 0.86);
       const sky = ctx.createLinearGradient(0, 0, 0, renderer.height);
       sky.addColorStop(0, environment.skyTop);
-      sky.addColorStop(0.6, environment.skyBottom);
+      sky.addColorStop(Math.max(0.22, horizonRatio), environment.skyBottom);
       sky.addColorStop(1, environment.seaBottom);
       ctx.fillStyle = sky;
       ctx.fillRect(0, 0, renderer.width, renderer.height);
@@ -383,14 +386,14 @@
       ctx.arc(renderer.width * 0.78, renderer.height * 0.2, 110, 0, Math.PI * 2);
       ctx.fill();
 
-      const hazeOffset = Math.max(-90, Math.min(90, -player.pitch * 180));
+      const hazeOffset = Math.max(-120, Math.min(120, -camera.forward.y * 240));
       ctx.fillStyle = environment.haze;
-      ctx.fillRect(0, renderer.height * 0.45 + hazeOffset, renderer.width, renderer.height * 0.18);
+      ctx.fillRect(0, renderer.height * horizonRatio - 40 + hazeOffset * 0.2, renderer.width, renderer.height * 0.2);
     }
 
     function drawOcean(camera, player, environment) {
       const horizonProbe = projectPoint({ x: camera.pos.x + camera.forward.x * 2800, y: 0, z: camera.pos.z + camera.forward.z * 2800 }, camera);
-      const horizonY = horizonProbe ? horizonProbe.y : renderer.height * 0.56;
+      const horizonY = horizonProbe ? horizonProbe.y : renderer.height * 0.52;
 
       const ocean = ctx.createLinearGradient(0, horizonY, 0, renderer.height);
       ocean.addColorStop(0, environment.seaTop);
@@ -403,10 +406,10 @@
       const step = 180;
       const baseX = Math.round(player.pos.x / step) * step;
       const baseZ = Math.round(player.pos.z / step) * step;
-      for (let x = -8; x <= 8; x += 1) {
+      for (let x = -14; x <= 14; x += 1) {
         const xPos = baseX + x * step;
-        const start = projectPoint({ x: xPos, y: 0, z: baseZ - 320 }, camera);
-        const end = projectPoint({ x: xPos, y: 0, z: baseZ + 3400 }, camera);
+        const start = projectPoint({ x: xPos, y: 0, z: baseZ - 700 }, camera);
+        const end = projectPoint({ x: xPos, y: 0, z: baseZ + 6200 }, camera);
         if (!start || !end) {
           continue;
         }
@@ -415,10 +418,10 @@
         ctx.lineTo(end.x, end.y);
         ctx.stroke();
       }
-      for (let z = 0; z <= 20; z += 1) {
+      for (let z = 0; z <= 34; z += 1) {
         const zPos = baseZ + z * step;
-        const start = projectPoint({ x: baseX - 1800, y: 0, z: zPos }, camera);
-        const end = projectPoint({ x: baseX + 1800, y: 0, z: zPos }, camera);
+        const start = projectPoint({ x: baseX - 3000, y: 0, z: zPos }, camera);
+        const end = projectPoint({ x: baseX + 3000, y: 0, z: zPos }, camera);
         if (!start || !end) {
           continue;
         }
@@ -657,7 +660,7 @@
       const camera = buildCamera(player);
       const terrain = buildTerrain(stage);
 
-      drawSky(environment, player);
+      drawSky(environment, player, camera);
       drawOcean(camera, player, environment);
       drawClouds(terrain.clouds, camera);
 

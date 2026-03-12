@@ -47,7 +47,8 @@
       throttle: 0,
       strafeVelocity: 0,
       liftVelocity: 0,
-      afterburner: 0
+      afterburner: 0,
+      cameraPitchBias: 0
     };
   }
 
@@ -298,11 +299,10 @@
       )
     );
     player.pos = Math3D.add(player.pos, Math3D.scale(movement, dt));
-    player.pos.y = Math3D.clamp(player.pos.y, CONFIG.world.floor + 18, CONFIG.world.ceiling);
+    player.pos.y = Math.min(player.pos.y, CONFIG.world.ceiling);
 
-    if (player.pos.y <= CONFIG.world.floor + 18 && player.pitch < 0) {
-      player.pitch *= 0.6;
-    }
+    const desiredCameraBias = verticalInput * 0.22;
+    player.cameraPitchBias = Math3D.lerp(player.cameraPitchBias, desiredCameraBias, dt * 4.6);
 
     player.ammoTimer += dt;
     while (player.ammo < player.maxAmmo && player.ammoTimer >= CONFIG.player.ammoRegenInterval) {
@@ -477,14 +477,6 @@
       enemy.damageFlash = Math.max(0, enemy.damageFlash - dt);
       if (enemy.kind === "fighter") {
         updateFighter(game, enemy, dt);
-      } else if (enemy.kind === "sam") {
-        updateSam(game, enemy, dt);
-      } else if (enemy.kind === "battleship") {
-        updateShip(game, enemy, dt, false);
-      } else if (enemy.kind === "flagship") {
-        updateShip(game, enemy, dt, true);
-      } else if (enemy.kind === "hq") {
-        updateShip(game, enemy, dt, true);
       }
     }
   }
@@ -528,28 +520,20 @@
       return { finished: true, success: false, reason: "撃墜" };
     }
 
+    if (player.pos.y <= CONFIG.world.floor) {
+      player.alive = false;
+      player.health = 0;
+      game.stageState.particles.push.apply(
+        game.stageState.particles,
+        createExplosion(player.pos, "rgba(255, 130, 95, 0.95)", 30, 132, 1.2)
+      );
+      return { finished: true, success: false, reason: "墜落" };
+    }
+
     const stage = game.currentStage;
     const alive = getAliveEnemies(game);
     if (stage.missionType === "eliminate_all" && alive.length === 0) {
       return { finished: true, success: true, reason: stage.completionLabel };
-    }
-
-    if (stage.missionType === "destroy_flagship") {
-      const targetAlive = alive.some(function (enemy) {
-        return enemy.kind === "flagship" || enemy.name === stage.primaryTargetName;
-      });
-      if (!targetAlive) {
-        return { finished: true, success: true, reason: stage.completionLabel };
-      }
-    }
-
-    if (stage.missionType === "destroy_hq") {
-      const targetAlive = alive.some(function (enemy) {
-        return enemy.kind === "hq" || enemy.name === stage.primaryTargetName;
-      });
-      if (!targetAlive) {
-        return { finished: true, success: true, reason: stage.completionLabel };
-      }
     }
 
     return { finished: false, success: false, reason: "" };
