@@ -13,9 +13,7 @@
     missionObjective: document.getElementById("mission-objective"),
     lockName: document.getElementById("lock-name"),
     lockDistance: document.getElementById("lock-distance"),
-    healthFill: document.getElementById("health-fill"),
     healthText: document.getElementById("health-text"),
-    ammoFill: document.getElementById("ammo-fill"),
     ammoText: document.getElementById("ammo-text"),
     speedText: document.getElementById("speed-text"),
     altitudeText: document.getElementById("altitude-text"),
@@ -32,7 +30,6 @@
     radarCanvas: document.getElementById("radar-canvas"),
     touchControls: document.getElementById("touch-controls"),
     touchStickFlight: document.getElementById("touch-stick-flight"),
-    touchStickMove: document.getElementById("touch-stick-move"),
     helpPanel: document.getElementById("help-panel"),
     helpTab: document.getElementById("tab-help"),
     menuTab: document.getElementById("tab-menu")
@@ -60,8 +57,7 @@
       touch: {
         enabled: false,
         activeButtons: {},
-        flightStick: null,
-        moveStick: null
+        flightStick: null
       }
     },
     uiActions: {
@@ -213,9 +209,7 @@
     dom.missionObjective.textContent = game.currentStage.objective;
     dom.stageText.textContent = String(game.stageIndex + 1) + " / " + CONFIG.stages.length;
 
-    dom.healthFill.style.width = ((player.health / player.maxHealth) * 100).toFixed(1) + "%";
     dom.healthText.textContent = player.health + " / " + player.maxHealth;
-    dom.ammoFill.style.width = ((player.ammo / player.maxAmmo) * 100).toFixed(1) + "%";
     dom.ammoText.textContent = player.ammo + " / " + player.maxAmmo;
 
     dom.speedText.textContent = Math.round(player.speed).toString();
@@ -356,17 +350,15 @@
     }
     const threshold = 0.32;
     const flight = touch.flightStick;
-    const move = touch.moveStick;
+    setVirtualKey("ArrowLeft", flight.x < -threshold);
+    setVirtualKey("ArrowRight", flight.x > threshold);
+    setVirtualKey("ArrowUp", flight.y < -threshold);
+    setVirtualKey("ArrowDown", flight.y > threshold);
 
-    setVirtualKey("KeyW", flight.y < -threshold);
-    setVirtualKey("KeyS", flight.y > threshold);
-    setVirtualKey("KeyQ", flight.x < -threshold);
-    setVirtualKey("KeyE", flight.x > threshold);
-
-    setVirtualKey("ArrowLeft", move.x < -threshold);
-    setVirtualKey("ArrowRight", move.x > threshold);
-    setVirtualKey("ArrowUp", move.y < -threshold);
-    setVirtualKey("ArrowDown", move.y > threshold);
+    setVirtualKey("KeyW", false);
+    setVirtualKey("KeyS", false);
+    setVirtualKey("KeyQ", false);
+    setVirtualKey("KeyE", false);
   }
 
   function bindTouchButton(button) {
@@ -442,10 +434,7 @@
     }
 
     game.input.touch.flightStick = { element: dom.touchStickFlight, pointerId: null, x: 0, y: 0 };
-    game.input.touch.moveStick = { element: dom.touchStickMove, pointerId: null, x: 0, y: 0 };
-
     bindTouchStick(game.input.touch.flightStick);
-    bindTouchStick(game.input.touch.moveStick);
 
     dom.touchControls.querySelectorAll(".touch-button").forEach(bindTouchButton);
   }
