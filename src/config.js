@@ -25,6 +25,50 @@
     { kind: "hq", name: "軍事基地 アイアンドーム", x: 0, y: 0, z: 2180, yaw: 3.14 }
   ];
 
+  const stage4Enemies = [
+    { kind: "fighter", name: "迎撃機 ヴァイス1", x: -620, y: 220, z: 920, yaw: 2.9 },
+    { kind: "fighter", name: "迎撃機 ヴァイス2", x: 620, y: 240, z: 980, yaw: 3.2 },
+    { kind: "fighter", name: "迎撃機 ヴァイス3", x: -260, y: 300, z: 1240, yaw: 3.05 },
+    { kind: "fighter", name: "迎撃機 ヴァイス4", x: 240, y: 280, z: 1310, yaw: 3.12 },
+    { kind: "fighter", name: "迎撃機 ヴァイス5", x: -720, y: 340, z: 1580, yaw: 2.88 },
+    { kind: "fighter", name: "迎撃機 ヴァイス6", x: 740, y: 360, z: 1660, yaw: 3.2 },
+    { kind: "fighter", name: "迎撃機 ヴァイス7", x: -160, y: 420, z: 1960, yaw: 3.06 },
+    { kind: "fighter", name: "迎撃機 ヴァイス8", x: 180, y: 410, z: 2040, yaw: 3.1 }
+  ];
+
+  const stage4Obstacles = [
+    { type: "building", x: -780, z: 980, radius: 150, height: 310 },
+    { type: "building", x: -460, z: 980, radius: 136, height: 260 },
+    { type: "building", x: -120, z: 980, radius: 142, height: 290 },
+    { type: "building", x: 220, z: 980, radius: 132, height: 250 },
+    { type: "building", x: 560, z: 980, radius: 148, height: 320 },
+    { type: "building", x: 860, z: 980, radius: 120, height: 220 },
+    { type: "building", x: -860, z: 1320, radius: 138, height: 270 },
+    { type: "building", x: -520, z: 1320, radius: 152, height: 340 },
+    { type: "building", x: -220, z: 1320, radius: 126, height: 210 },
+    { type: "building", x: 120, z: 1320, radius: 160, height: 360 },
+    { type: "building", x: 460, z: 1320, radius: 126, height: 230 },
+    { type: "building", x: 820, z: 1320, radius: 146, height: 300 },
+    { type: "building", x: -740, z: 1660, radius: 130, height: 240 },
+    { type: "building", x: -420, z: 1660, radius: 154, height: 330 },
+    { type: "building", x: -80, z: 1660, radius: 136, height: 280 },
+    { type: "building", x: 280, z: 1660, radius: 148, height: 320 },
+    { type: "building", x: 620, z: 1660, radius: 132, height: 250 },
+    { type: "building", x: 900, z: 1660, radius: 118, height: 210 },
+    { type: "building", x: -860, z: 2020, radius: 120, height: 220 },
+    { type: "building", x: -560, z: 2020, radius: 148, height: 310 },
+    { type: "building", x: -220, z: 2020, radius: 162, height: 390 },
+    { type: "building", x: 140, z: 2020, radius: 146, height: 300 },
+    { type: "building", x: 500, z: 2020, radius: 154, height: 350 },
+    { type: "building", x: 860, z: 2020, radius: 126, height: 240 },
+    { type: "building", x: -700, z: 2380, radius: 140, height: 290 },
+    { type: "building", x: -360, z: 2380, radius: 122, height: 220 },
+    { type: "building", x: -20, z: 2380, radius: 156, height: 340 },
+    { type: "building", x: 320, z: 2380, radius: 130, height: 250 },
+    { type: "building", x: 660, z: 2380, radius: 146, height: 320 },
+    { type: "building", x: 940, z: 2380, radius: 114, height: 200 }
+  ];
+
   SkyDominion.CONFIG = {
     title: "空軍無双",
     player: {
@@ -126,6 +170,26 @@
           { type: "mountain", x: -520, z: 1260, radius: 240, height: 180 },
           { type: "mountain", x: 520, z: 1260, radius: 240, height: 180 }
         ]
+      },
+      {
+        id: "urban-tempest",
+        name: "ステージ4 / 市街地制空戦",
+        shortName: "市街地制空戦",
+        objective: "超高層ビル群を縫って侵入した敵航空隊を迎撃せよ",
+        completionLabel: "敵航空隊壊滅",
+        environment: {
+          skyTop: "#86a1c4",
+          skyBottom: "#f0b07e",
+          seaTop: "#20364d",
+          seaBottom: "#050b12",
+          haze: "rgba(195, 205, 220, 0.16)",
+          sunColor: "rgba(255, 230, 190, 0.16)",
+          terrainType: "metropolis"
+        },
+        missionType: "eliminate_all",
+        playerStart: { x: 0, y: 300, z: -520, yaw: 0, pitch: 0.03, roll: 0 },
+        enemies: stage4Enemies,
+        obstacles: stage4Obstacles
       }
     ]
   };

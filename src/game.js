@@ -472,7 +472,7 @@
         eyebrow: "任務成功",
         title: isLastStage ? "全作戦完了" : "空域制圧完了",
         body: isLastStage
-          ? "敵司令系統を壊滅させ、3つの作戦空域を制圧しました。再出撃するか、任意のステージを選択できます。"
+          ? "敵司令系統を壊滅させ、4つの作戦空域を制圧しました。再出撃するか、任意のステージを選択できます。"
           : result.reason + "。次の戦域へ移行します。",
         primaryLabel: isLastStage ? "このステージを再出撃" : "次のステージへ",
         secondaryLabel: "ステージ選択",
