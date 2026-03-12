@@ -6,8 +6,9 @@
   const ENEMY_STATS = {
     fighter: { hp: 1, radius: 16, speed: 190, score: 1 },
     sam: { hp: 1, radius: 18, speed: 0, score: 1 },
-    battleship: { hp: 2, radius: 34, speed: 0, score: 2 },
-    flagship: { hp: 4, radius: 46, speed: 0, score: 4 },
+    battleship: { hp: 2, radius: 40, speed: 0, score: 2 },
+    carrier: { hp: 3, radius: 52, speed: 0, score: 3 },
+    flagship: { hp: 4, radius: 60, speed: 0, score: 4 },
     hq: { hp: 5, radius: 54, speed: 0, score: 5 }
   };
 
@@ -517,6 +518,14 @@
       if (enemy.kind === "fighter") {
         updateFighter(game, enemy, dt, fighterIndex, fighterTotal);
         fighterIndex += 1;
+      } else if (enemy.kind === "sam") {
+        updateSam(game, enemy, dt);
+      } else if (enemy.kind === "battleship") {
+        updateShip(game, enemy, dt, false);
+      } else if (enemy.kind === "carrier") {
+        updateShip(game, enemy, dt, true);
+      } else if (enemy.kind === "flagship" || enemy.kind === "hq") {
+        updateShip(game, enemy, dt, true);
       }
     }
   }
@@ -559,6 +568,55 @@
     });
   }
 
+
+
+  function resolveAircraftCollisions(game) {
+    const player = game.stageState.player;
+    if (!player.alive) {
+      return null;
+    }
+
+    for (let i = 0; i < game.stageState.enemies.length; i += 1) {
+      const enemy = game.stageState.enemies[i];
+      if (!enemy.alive) {
+        continue;
+      }
+      if (Math3D.distance(player.pos, enemy.pos) <= player.radius + enemy.radius * 0.82) {
+        player.alive = false;
+        player.health = 0;
+        enemy.alive = false;
+        enemy.hp = 0;
+        game.stageState.particles.push.apply(
+          game.stageState.particles,
+          createExplosion(player.pos, "rgba(255, 150, 92, 0.95)", 36, 142, 1.35)
+        );
+        return { finished: true, success: false, reason: "空中衝突" };
+      }
+    }
+
+    return null;
+  }
+
+  function resolvePlayerTerrainCollision(game) {
+    const player = game.stageState.player;
+    const obstacles = (game.currentStage && game.currentStage.obstacles) || [];
+    for (let i = 0; i < obstacles.length; i += 1) {
+      const obstacle = obstacles[i];
+      const horizontal = Math.hypot(player.pos.x - obstacle.x, player.pos.z - obstacle.z);
+      const safeRadius = obstacle.radius + player.radius * 0.65;
+      if (horizontal <= safeRadius && player.pos.y <= obstacle.height) {
+        player.alive = false;
+        player.health = 0;
+        game.stageState.particles.push.apply(
+          game.stageState.particles,
+          createExplosion(player.pos, "rgba(255, 140, 98, 0.95)", 34, 138, 1.3)
+        );
+        return { finished: true, success: false, reason: "地形衝突" };
+      }
+    }
+    return null;
+  }
+
   function checkMissionStatus(game) {
     const player = game.stageState.player;
     if (!player.alive) {
@@ -573,6 +631,16 @@
         createExplosion(player.pos, "rgba(255, 130, 95, 0.95)", 30, 132, 1.2)
       );
       return { finished: true, success: false, reason: "墜落" };
+    }
+
+    const terrainHit = resolvePlayerTerrainCollision(game);
+    if (terrainHit) {
+      return terrainHit;
+    }
+
+    const aircraftHit = resolveAircraftCollisions(game);
+    if (aircraftHit) {
+      return aircraftHit;
     }
 
     const stage = game.currentStage;

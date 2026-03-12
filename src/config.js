@@ -11,7 +11,7 @@
 
   const stage2Enemies = [
     { kind: "battleship", name: "重巡洋艦 ヴォルカ", x: -860, y: 0, z: 1080, yaw: 3.14 },
-    { kind: "battleship", name: "重巡洋艦 ネーレウス", x: 860, y: 0, z: 1080, yaw: 3.14 },
+    { kind: "carrier", name: "空母 アトラス", x: 860, y: 0, z: 1080, yaw: 3.14 },
     { kind: "battleship", name: "駆逐艦 ストーム", x: -340, y: 0, z: 1420, yaw: 3.14 },
     { kind: "battleship", name: "駆逐艦 ガスト", x: 340, y: 0, z: 1420, yaw: 3.14 },
     { kind: "flagship", name: "旗艦 リヴァイアサン", x: 0, y: 0, z: 1880, yaw: 3.14 }
@@ -76,7 +76,12 @@
         },
         missionType: "eliminate_all",
         playerStart: { x: 0, y: 210, z: -320, yaw: 0, pitch: 0.04, roll: 0 },
-        enemies: stage1Enemies
+        enemies: stage1Enemies,
+        obstacles: [
+          { type: "island", x: -1100, z: 1620, radius: 240, height: 170 },
+          { type: "island", x: 980, z: 1880, radius: 260, height: 190 },
+          { type: "island", x: 160, z: 2460, radius: 320, height: 230 }
+        ]
       },
       {
         id: "harbor-spear",
@@ -95,7 +100,14 @@
         },
         missionType: "eliminate_all",
         playerStart: { x: 0, y: 230, z: -380, yaw: 0, pitch: 0.02, roll: 0 },
-        enemies: stage2Enemies
+        enemies: stage2Enemies,
+        obstacles: [
+          { type: "city", x: -560, z: 1510, radius: 230, height: 120 },
+          { type: "city", x: 560, z: 1510, radius: 230, height: 120 },
+          { type: "dock", x: 0, z: 1460, radius: 130, height: 60 },
+          { type: "island", x: -820, z: 1800, radius: 250, height: 180 },
+          { type: "island", x: 860, z: 1820, radius: 260, height: 190 }
+        ]
       },
       {
         id: "mountain-crown",
@@ -114,7 +126,12 @@
         },
         missionType: "eliminate_all",
         playerStart: { x: 0, y: 260, z: -440, yaw: 0, pitch: 0.01, roll: 0 },
-        enemies: stage3Enemies
+        enemies: stage3Enemies,
+        obstacles: [
+          { type: "mountain", x: 0, z: 1880, radius: 380, height: 250 },
+          { type: "mountain", x: -520, z: 1260, radius: 240, height: 180 },
+          { type: "mountain", x: 520, z: 1260, radius: 240, height: 180 }
+        ]
       }
     ]
   };
