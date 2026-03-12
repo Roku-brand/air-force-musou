@@ -76,6 +76,8 @@
       burstShots: 0,
       orbitSign: Math.random() > 0.5 ? 1 : -1,
       weaveSeed: Math.random() * Math.PI * 2,
+      formationOffset: Math.random() * Math.PI * 2,
+      preferredRange: randomRange(360, 620),
       damageFlash: 0,
       bob: Math.random() * Math.PI * 2
     };
@@ -331,22 +333,36 @@
     player.afterburner = Math.max(0, player.afterburner - dt);
   }
 
-  function updateFighter(game, enemy, dt) {
+  function updateFighter(game, enemy, dt, formationIndex, formationCount) {
     const player = game.stageState.player;
+    const stageTime = game.stageState.stageTime;
     enemy.prevPos = Math3D.vec3(enemy.pos.x, enemy.pos.y, enemy.pos.z);
 
-    const offset = Math3D.sub(player.pos, enemy.pos);
+    const ringAngle = stageTime * 0.22 + enemy.formationOffset + (formationIndex / Math.max(1, formationCount)) * Math.PI * 2;
+    const targetPoint = {
+      x: player.pos.x + Math.cos(ringAngle) * enemy.preferredRange,
+      y: Math3D.clamp(player.pos.y + Math.sin(stageTime * 0.55 + enemy.weaveSeed) * 120, 120, 520),
+      z: player.pos.z + Math.sin(ringAngle) * enemy.preferredRange
+    };
+
+    const offset = Math3D.sub(targetPoint, enemy.pos);
+    const playerOffset = Math3D.sub(player.pos, enemy.pos);
     const distance = Math3D.length(offset);
+    const playerDistance = Math3D.length(playerOffset);
     const flatDistance = Math.max(1, Math.sqrt(offset.x * offset.x + offset.z * offset.z));
     let desiredYaw = Math.atan2(offset.x, offset.z);
     let desiredPitch = Math.atan2(offset.y, flatDistance);
 
-    if (distance < 280) {
-      desiredYaw += enemy.orbitSign * 1.1;
-      desiredPitch += Math.sin(game.clock * 1.7 + enemy.weaveSeed) * 0.18;
+    if (playerDistance < 240) {
+      const breakAwayYaw = Math.atan2(-playerOffset.x, -playerOffset.z);
+      desiredYaw = breakAwayYaw + enemy.orbitSign * 0.55;
+      desiredPitch = Math3D.clamp(desiredPitch + 0.08, -0.4, 0.5);
+    } else if (distance < 220) {
+      desiredYaw += enemy.orbitSign * 0.9;
+      desiredPitch += Math.sin(game.clock * 1.7 + enemy.weaveSeed) * 0.12;
     } else {
-      desiredYaw += Math.sin(game.clock * 0.7 + enemy.weaveSeed) * 0.12;
-      desiredPitch += Math.sin(game.clock * 1.3 + enemy.weaveSeed) * 0.05;
+      desiredYaw += Math.sin(game.clock * 0.7 + enemy.weaveSeed) * 0.08;
+      desiredPitch += Math.sin(game.clock * 1.3 + enemy.weaveSeed) * 0.04;
     }
 
     enemy.yaw = Math3D.approachAngle(enemy.yaw, desiredYaw, dt * 1.3);
@@ -360,10 +376,10 @@
     enemy.cooldown -= dt;
     enemy.burstCooldown -= dt;
 
-    const aimDot = Math3D.dot(basis.forward, Math3D.normalize(offset));
-    if (distance < 760 && aimDot > 0.93) {
+    const aimDot = Math3D.dot(basis.forward, Math3D.normalize(playerOffset));
+    if (playerDistance < 980 && playerDistance > 260 && aimDot > 0.91) {
       if (enemy.burstShots > 0 && enemy.burstCooldown <= 0) {
-        fireEnemyBullet(game.stageState, enemy, Math3D.normalize(offset), 0.03, 430, 1);
+        fireEnemyBullet(game.stageState, enemy, Math3D.normalize(playerOffset), 0.03, 430, 1);
         enemy.burstShots -= 1;
         enemy.burstCooldown = 0.14;
       } else if (enemy.cooldown <= 0) {
@@ -479,6 +495,11 @@
 
   function updateEnemies(game, dt) {
     const enemies = game.stageState.enemies;
+    const fighterTotal = enemies.reduce(function (count, enemy) {
+      return count + (enemy.alive && enemy.kind === "fighter" ? 1 : 0);
+    }, 0);
+    let fighterIndex = 0;
+
     for (let i = 0; i < enemies.length; i += 1) {
       const enemy = enemies[i];
       if (!enemy.alive) {
@@ -488,7 +509,8 @@
 
       enemy.damageFlash = Math.max(0, enemy.damageFlash - dt);
       if (enemy.kind === "fighter") {
-        updateFighter(game, enemy, dt);
+        updateFighter(game, enemy, dt, fighterIndex, fighterTotal);
+        fighterIndex += 1;
       }
     }
   }
@@ -574,5 +596,4 @@
     getAliveEnemies
   };
 })();
-
 
