@@ -129,21 +129,91 @@
     const now = context.currentTime;
     const volume = options && options.volume != null ? options.volume : 0.18;
     const playbackRate = options && options.playbackRate != null ? options.playbackRate : 1;
-    const osc = context.createOscillator();
-    const gain = context.createGain();
+    const output = context.createGain();
+    output.gain.value = 1;
+    output.connect(game.audio.master);
 
-    osc.connect(gain);
-    gain.connect(game.audio.master);
+    function createLayerGain(amount) {
+      const gain = context.createGain();
+      gain.gain.value = amount;
+      gain.connect(output);
+      return gain;
+    }
+
+    function createNoiseSource(duration, layerGain, options) {
+      const sampleRate = context.sampleRate;
+      const length = Math.max(1, Math.floor(sampleRate * duration));
+      const buffer = context.createBuffer(1, length, sampleRate);
+      const data = buffer.getChannelData(0);
+      const color = options && options.color ? options.color : "white";
+      let previous = 0;
+      for (let i = 0; i < length; i += 1) {
+        const white = Math.random() * 2 - 1;
+        if (color === "brown") {
+          previous = (previous + white * 0.045) / 1.022;
+          data[i] = previous * 2.5;
+        } else if (color === "pink") {
+          previous = previous * 0.985 + white * 0.22;
+          data[i] = previous;
+        } else {
+          data[i] = white;
+        }
+      }
+
+      const source = context.createBufferSource();
+      source.buffer = buffer;
+      source.connect(layerGain);
+      source.start(now);
+      source.stop(now + duration);
+      return source;
+    }
+
+    function createTone(type, frequency, start, end, layerGain, sweepTo) {
+      const osc = context.createOscillator();
+      osc.type = type;
+      osc.frequency.setValueAtTime(Math.max(1, frequency), start);
+      if (sweepTo != null) {
+        osc.frequency.exponentialRampToValueAtTime(Math.max(1, sweepTo), end);
+      }
+      osc.connect(layerGain);
+      osc.start(start);
+      osc.stop(end);
+      return osc;
+    }
 
     if (soundName === "playerMissile") {
-      osc.type = "sawtooth";
-      osc.frequency.setValueAtTime(310 * playbackRate, now);
-      osc.frequency.exponentialRampToValueAtTime(120 * playbackRate, now + 0.12);
-      gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.exponentialRampToValueAtTime(volume, now + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
-      osc.start(now);
-      osc.stop(now + 0.2);
+      const duration = 0.45;
+
+      const bodyGain = createLayerGain(volume * 0.95);
+      bodyGain.gain.setValueAtTime(0.0001, now);
+      bodyGain.gain.exponentialRampToValueAtTime(volume * 0.95, now + 0.05);
+      bodyGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+      const bodyFilter = context.createBiquadFilter();
+      bodyFilter.type = "bandpass";
+      bodyFilter.frequency.setValueAtTime(440 * playbackRate, now);
+      bodyFilter.frequency.exponentialRampToValueAtTime(180 * playbackRate, now + duration);
+      bodyFilter.Q.value = 0.65;
+      bodyGain.disconnect();
+      bodyGain.connect(bodyFilter);
+      bodyFilter.connect(output);
+      createNoiseSource(duration, bodyGain, { color: "pink" });
+
+      const thrustGain = createLayerGain(volume * 0.58);
+      thrustGain.gain.setValueAtTime(0.0001, now);
+      thrustGain.gain.exponentialRampToValueAtTime(volume * 0.58, now + 0.015);
+      thrustGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.24);
+      createTone("sawtooth", 230 * playbackRate, now, now + 0.24, thrustGain, 95 * playbackRate);
+
+      const clickGain = createLayerGain(volume * 0.28);
+      clickGain.gain.setValueAtTime(volume * 0.28, now);
+      clickGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.05);
+      const clickFilter = context.createBiquadFilter();
+      clickFilter.type = "highpass";
+      clickFilter.frequency.value = 1400;
+      clickGain.disconnect();
+      clickGain.connect(clickFilter);
+      clickFilter.connect(output);
+      createNoiseSource(0.07, clickGain, { color: "white" });
       return;
     }
 
@@ -171,16 +241,80 @@
     }
 
     if (soundName === "enemyDown") {
-      osc.type = "triangle";
-      osc.frequency.setValueAtTime(260 * playbackRate, now);
-      osc.frequency.exponentialRampToValueAtTime(70 * playbackRate, now + 0.22);
-      gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.exponentialRampToValueAtTime(volume, now + 0.03);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.24);
-      osc.start(now);
-      osc.stop(now + 0.26);
+      const duration = 0.95;
+
+      const boomGain = createLayerGain(volume * 0.92);
+      boomGain.gain.setValueAtTime(0.0001, now);
+      boomGain.gain.exponentialRampToValueAtTime(volume * 0.92, now + 0.03);
+      boomGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+      const lowPass = context.createBiquadFilter();
+      lowPass.type = "lowpass";
+      lowPass.frequency.setValueAtTime(620, now);
+      lowPass.frequency.exponentialRampToValueAtTime(110, now + duration);
+      boomGain.disconnect();
+      boomGain.connect(lowPass);
+      lowPass.connect(output);
+      createNoiseSource(duration, boomGain, { color: "brown" });
+
+      const punchGain = createLayerGain(volume * 0.55);
+      punchGain.gain.setValueAtTime(0.0001, now);
+      punchGain.gain.exponentialRampToValueAtTime(volume * 0.55, now + 0.01);
+      punchGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
+      createTone("triangle", 150 * playbackRate, now, now + 0.22, punchGain, 42 * playbackRate);
+
+      const debrisGain = createLayerGain(volume * 0.24);
+      debrisGain.gain.setValueAtTime(0.0001, now + 0.06);
+      debrisGain.gain.exponentialRampToValueAtTime(volume * 0.24, now + 0.12);
+      debrisGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.62);
+      const debrisFilter = context.createBiquadFilter();
+      debrisFilter.type = "bandpass";
+      debrisFilter.frequency.value = 1500;
+      debrisFilter.Q.value = 1.3;
+      debrisGain.disconnect();
+      debrisGain.connect(debrisFilter);
+      debrisFilter.connect(output);
+      createNoiseSource(0.62, debrisGain, { color: "white" });
       return;
     }
+
+    if (soundName === "missionComplete") {
+      const duration = 1.45;
+      const droneGain = createLayerGain(volume * 0.2);
+      droneGain.gain.setValueAtTime(0.0001, now);
+      droneGain.gain.exponentialRampToValueAtTime(volume * 0.2, now + 0.12);
+      droneGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+      const droneFilter = context.createBiquadFilter();
+      droneFilter.type = "lowpass";
+      droneFilter.frequency.value = 920;
+      droneGain.disconnect();
+      droneGain.connect(droneFilter);
+      droneFilter.connect(output);
+      createNoiseSource(duration, droneGain, { color: "pink" });
+
+      const tones = [523.25, 659.25, 783.99];
+      tones.forEach(function (freq, index) {
+        const start = now + index * 0.2;
+        const end = start + 0.7;
+        const toneGain = createLayerGain(volume * (0.33 - index * 0.04));
+        toneGain.gain.setValueAtTime(0.0001, start);
+        toneGain.gain.exponentialRampToValueAtTime(volume * (0.33 - index * 0.04), start + 0.02);
+        toneGain.gain.exponentialRampToValueAtTime(0.0001, end);
+        createTone("triangle", freq * playbackRate, start, end, toneGain, (freq * 1.03) * playbackRate);
+      });
+
+      const chimeGain = createLayerGain(volume * 0.16);
+      chimeGain.gain.setValueAtTime(0.0001, now + 0.42);
+      chimeGain.gain.exponentialRampToValueAtTime(volume * 0.16, now + 0.45);
+      chimeGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.1);
+      createTone("sine", 1046.5 * playbackRate, now + 0.42, now + 1.1, chimeGain, 1174.66 * playbackRate);
+      return;
+    }
+
+    const osc = context.createOscillator();
+    const gain = context.createGain();
+
+    osc.connect(gain);
+    gain.connect(output);
 
     if (soundName === "playerDown") {
       osc.type = "sawtooth";
@@ -307,6 +441,7 @@
   function handleMissionEnd(result) {
     game.state = "result";
     if (result.success) {
+      playSound("missionComplete", { volume: 0.22 });
       const isLastStage = game.stageIndex === CONFIG.stages.length - 1;
       openMessage({
         eyebrow: "任務成功",
