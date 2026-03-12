@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
@@ -70,34 +70,71 @@
     </div>
 
     <div class="overlay overlay-visible" id="menu-overlay">
-      <div class="panel hero-panel">
+      <div class="panel hero-panel top-page-panel">
         <div class="eyebrow">三次元 空戦シミュレーション</div>
         <h1>空軍無双</h1>
-        <p class="lead">ステージを選択して出撃してください。</p>
+        <p class="lead">ステージ選択で即出撃。設定・カスタマイズはタブで切り替えます。</p>
 
-        <div class="stage-cards" id="stage-cards"></div>
-
-        <div class="button-row">
-          <button class="action-button" id="start-button">作戦開始</button>
+        <div class="menu-tab-row">
+          <button class="menu-tab-button menu-tab-active" data-menu-tab="stage" type="button">ステージ選択</button>
+          <button class="menu-tab-button" data-menu-tab="settings" type="button">設定</button>
+          <button class="menu-tab-button" data-menu-tab="customize" type="button">カスタマイズ</button>
         </div>
-      </div>
-    </div>
 
-    <div class="ui-tabs">
-      <button class="ui-tab-button" id="tab-help" type="button">操作方法</button>
-      <button class="ui-tab-button" id="tab-menu" type="button">ステージ選択</button>
-    </div>
+        <section class="menu-section" id="menu-tab-stage">
+          <div class="stage-cards" id="stage-cards"></div>
+          <p class="menu-note">※ ステージカードを選択すると、そのまま戦闘画面へ遷移します。</p>
+        </section>
 
-    <div class="panel help-panel hidden" id="help-panel">
-      <h3>操作方法</h3>
-      <div class="controls-grid">
-        <div><span>↑ ↓ ← →</span>操縦（機体の進行）</div>
-        <div><span>Shift</span>速度（長押しで加速）</div>
-        <div><span>Space</span>射撃</div>
-        <div><span>R / Esc</span>再出撃 / メニュー</div>
-        <div><span>左スティック</span>操縦（上下左右）</div>
-        <div><span>右ボタン(速度)</span>長押しで加速</div>
-        <div><span>右ボタン(射撃)</span>ミサイル発射</div>
+        <section class="menu-section hidden" id="menu-tab-settings">
+          <div class="setting-grid">
+            <label class="menu-field">
+              <span>操作モード</span>
+              <select id="control-mode-select">
+                <option value="standard">スタンダード（矢印キー）</option>
+                <option value="wasd">WASD（WASD + Q/E）</option>
+              </select>
+            </label>
+            <label class="menu-field checkbox-field">
+              <input type="checkbox" id="invert-y-toggle">
+              <span>上下操作を反転する</span>
+            </label>
+            <label class="menu-field">
+              <span>サウンド音量</span>
+              <input type="range" id="volume-range" min="0" max="100" step="5" value="60">
+            </label>
+          </div>
+          <div class="controls-grid compact-controls-grid">
+            <div><span>↑ ↓ ← →</span>操縦（機体の進行）</div>
+            <div><span>WASD + Q/E</span>WASD操作モード時</div>
+            <div><span>Shift</span>速度（長押しで加速）</div>
+            <div><span>Space</span>射撃</div>
+            <div><span>R / Esc</span>再出撃 / メニュー</div>
+          </div>
+          <p class="menu-note" id="control-summary">現在の操作: スタンダード（矢印キー） / 反転なし / 音量60%</p>
+        </section>
+
+        <section class="menu-section hidden" id="menu-tab-customize">
+          <div class="setting-grid">
+            <label class="menu-field">
+              <span>機体カラー</span>
+              <select id="aircraft-color-select">
+                <option value="standard">標準迷彩</option>
+                <option value="navy">ネイビー</option>
+                <option value="sunset">サンセット</option>
+              </select>
+            </label>
+            <label class="menu-field">
+              <span>フレーム</span>
+              <select id="aircraft-frame-select">
+                <option value="balanced">バランス型</option>
+                <option value="light">軽量型（機動）</option>
+                <option value="heavy">重装型（耐久）</option>
+              </select>
+            </label>
+          </div>
+          <p class="menu-note" id="customize-summary">バランス型: 耐久3 / ミサイル20 / 最高速320</p>
+        </section>
       </div>
     </div>
 

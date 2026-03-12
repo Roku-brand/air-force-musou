@@ -25,14 +25,27 @@
     messageBody: document.getElementById("message-body"),
     messagePrimary: document.getElementById("message-primary"),
     messageSecondary: document.getElementById("message-secondary"),
-    startButton: document.getElementById("start-button"),
     stageCards: document.getElementById("stage-cards"),
     radarCanvas: document.getElementById("radar-canvas"),
     touchControls: document.getElementById("touch-controls"),
     touchStickFlight: document.getElementById("touch-stick-flight"),
-    helpPanel: document.getElementById("help-panel"),
-    helpTab: document.getElementById("tab-help"),
-    menuTab: document.getElementById("tab-menu")
+    menuTabButtons: document.querySelectorAll("[data-menu-tab]"),
+    stageTabPanel: document.getElementById("menu-tab-stage"),
+    settingsTabPanel: document.getElementById("menu-tab-settings"),
+    customizeTabPanel: document.getElementById("menu-tab-customize"),
+    controlModeSelect: document.getElementById("control-mode-select"),
+    invertYToggle: document.getElementById("invert-y-toggle"),
+    volumeRange: document.getElementById("volume-range"),
+    controlSummary: document.getElementById("control-summary"),
+    aircraftColorSelect: document.getElementById("aircraft-color-select"),
+    aircraftFrameSelect: document.getElementById("aircraft-frame-select"),
+    customizeSummary: document.getElementById("customize-summary")
+  };
+
+  const FRAME_PRESETS = {
+    balanced: { label: "バランス型", maxHealth: 3, maxAmmo: 20, maxSpeed: 320 },
+    light: { label: "軽量型", maxHealth: 2, maxAmmo: 16, maxSpeed: 360 },
+    heavy: { label: "重装型", maxHealth: 4, maxAmmo: 24, maxSpeed: 285 }
   };
 
   const game = {
@@ -53,6 +66,13 @@
       context: null,
       master: null,
       enabled: false
+    },
+    settings: {
+      controlMode: "standard",
+      invertY: false,
+      volume: 60,
+      aircraftColor: "standard",
+      aircraftFrame: "balanced"
     },
     previousLockId: null,
     input: {
@@ -84,7 +104,7 @@
     try {
       const context = new AudioContextCtor();
       const master = context.createGain();
-      master.gain.value = 0.2;
+      master.gain.value = game.settings.volume / 100 * 0.35;
       master.connect(context.destination);
       game.audio.context = context;
       game.audio.master = master;
@@ -180,9 +200,7 @@
 
   function setMenuVisible(visible) {
     setOverlayVisibility(dom.menuOverlay, visible);
-    if (visible) {
-      dom.helpPanel.classList.add("hidden");
-    }
+    document.body.classList.toggle("menu-active", visible);
   }
 
   function setMessageVisible(visible) {
@@ -214,7 +232,8 @@
       card.innerHTML = "<h3>" + stage.shortName + "</h3><p>" + stage.objective + "</p><span class=\"stage-tag\">" + stage.completionLabel + "</span>";
       card.addEventListener("click", function () {
         game.selectedStageIndex = index;
-        showStageBriefing(index);
+        buildStageCards();
+        launchStage(index);
       });
       dom.stageCards.appendChild(card);
     });
@@ -232,15 +251,40 @@
     game.input.keyboardKeys = {};
     game.input.virtualKeys = {};
     game.previousLockId = null;
+
+    const frame = FRAME_PRESETS[game.settings.aircraftFrame] || FRAME_PRESETS.balanced;
+    game.stageState.player.maxHealth = frame.maxHealth;
+    game.stageState.player.health = frame.maxHealth;
+    game.stageState.player.maxAmmo = frame.maxAmmo;
+    game.stageState.player.ammo = frame.maxAmmo;
+
     dom.hud.classList.remove("hidden");
     updateHud();
+  }
+
+  function updateControlSummary() {
+    const mode = game.settings.controlMode === "wasd" ? "WASD" : "スタンダード（矢印キー）";
+    const invert = game.settings.invertY ? "反転あり" : "反転なし";
+    dom.controlSummary.textContent = "現在の操作: " + mode + " / " + invert + " / 音量" + game.settings.volume + "%";
+  }
+
+  function updateCustomizeSummary() {
+    const frame = FRAME_PRESETS[game.settings.aircraftFrame] || FRAME_PRESETS.balanced;
+    dom.customizeSummary.textContent = frame.label + ": 耐久" + frame.maxHealth + " / ミサイル" + frame.maxAmmo + " / 最高速" + frame.maxSpeed;
+  }
+
+
+  function launchStage(index) {
+    prepareStage(index);
+    closeMessage();
+    game.state = "playing";
+    setMenuVisible(false);
   }
 
   function showStageBriefing(index) {
     prepareStage(index);
     game.state = "briefing";
     setMenuVisible(false);
-    dom.helpPanel.classList.add("hidden");
     openMessage({
       eyebrow: game.currentStage.name,
       title: game.currentStage.shortName,
@@ -298,7 +342,7 @@
         secondaryLabel: "ステージ選択",
         onPrimary: function () {
           closeMessage();
-          showStageBriefing(game.stageIndex);
+          launchStage(game.stageIndex);
         },
         onSecondary: function () {
           closeMessage();
@@ -459,15 +503,68 @@
     }
     const threshold = 0.32;
     const flight = touch.flightStick;
-    setVirtualKey("ArrowLeft", flight.x < -threshold);
-    setVirtualKey("ArrowRight", flight.x > threshold);
-    setVirtualKey("ArrowUp", flight.y < -threshold);
-    setVirtualKey("ArrowDown", flight.y > threshold);
+    if (game.settings.controlMode === "wasd") {
+      setVirtualKey("KeyA", flight.x < -threshold);
+      setVirtualKey("KeyD", flight.x > threshold);
+      if (game.settings.invertY) {
+        setVirtualKey("KeyS", flight.y < -threshold);
+        setVirtualKey("KeyW", flight.y > threshold);
+      } else {
+        setVirtualKey("KeyW", flight.y < -threshold);
+        setVirtualKey("KeyS", flight.y > threshold);
+      }
+      setVirtualKey("ArrowLeft", false);
+      setVirtualKey("ArrowRight", false);
+      setVirtualKey("ArrowUp", false);
+      setVirtualKey("ArrowDown", false);
+    } else {
+      setVirtualKey("ArrowLeft", flight.x < -threshold);
+      setVirtualKey("ArrowRight", flight.x > threshold);
+      if (game.settings.invertY) {
+        setVirtualKey("ArrowDown", flight.y < -threshold);
+        setVirtualKey("ArrowUp", flight.y > threshold);
+      } else {
+        setVirtualKey("ArrowUp", flight.y < -threshold);
+        setVirtualKey("ArrowDown", flight.y > threshold);
+      }
+      setVirtualKey("KeyA", false);
+      setVirtualKey("KeyD", false);
+    }
 
-    setVirtualKey("KeyW", false);
-    setVirtualKey("KeyS", false);
     setVirtualKey("KeyQ", false);
     setVirtualKey("KeyE", false);
+  }
+
+  function setupMenuControls() {
+    dom.controlModeSelect.addEventListener("change", function () {
+      game.settings.controlMode = dom.controlModeSelect.value;
+      updateControlSummary();
+    });
+
+    dom.invertYToggle.addEventListener("change", function () {
+      game.settings.invertY = dom.invertYToggle.checked;
+      updateControlSummary();
+    });
+
+    dom.volumeRange.addEventListener("input", function () {
+      game.settings.volume = Number(dom.volumeRange.value);
+      if (game.audio.master) {
+        game.audio.master.gain.value = game.settings.volume / 100 * 0.35;
+      }
+      updateControlSummary();
+    });
+
+    dom.aircraftColorSelect.addEventListener("change", function () {
+      game.settings.aircraftColor = dom.aircraftColorSelect.value;
+    });
+
+    dom.aircraftFrameSelect.addEventListener("change", function () {
+      game.settings.aircraftFrame = dom.aircraftFrameSelect.value;
+      updateCustomizeSummary();
+    });
+
+    updateControlSummary();
+    updateCustomizeSummary();
   }
 
   function bindTouchButton(button) {
@@ -556,18 +653,29 @@
     buildStageCards();
   }
 
-  function setupFixedTabs() {
-    dom.helpTab.addEventListener("click", function () {
-      const hidden = dom.helpPanel.classList.toggle("hidden");
-      if (!hidden) {
-        setMenuVisible(false);
-        closeMessage();
-      }
+  function setupMenuTabs() {
+    const panels = {
+      stage: dom.stageTabPanel,
+      settings: dom.settingsTabPanel,
+      customize: dom.customizeTabPanel
+    };
+
+    function activateMenuTab(name) {
+      Object.keys(panels).forEach(function (key) {
+        panels[key].classList.toggle("hidden", key !== name);
+      });
+      dom.menuTabButtons.forEach(function (button) {
+        button.classList.toggle("menu-tab-active", button.dataset.menuTab === name);
+      });
+    }
+
+    dom.menuTabButtons.forEach(function (button) {
+      button.addEventListener("click", function () {
+        activateMenuTab(button.dataset.menuTab);
+      });
     });
-    dom.menuTab.addEventListener("click", function () {
-      dom.helpPanel.classList.add("hidden");
-      showStageMenu();
-    });
+
+    activateMenuTab("stage");
   }
 
   function lockMobileLandscape() {
@@ -578,8 +686,38 @@
     screen.orientation.lock("landscape").catch(function () {});
   }
 
+  function mapControlCode(code) {
+    if (game.settings.controlMode !== "wasd") {
+      if (!game.settings.invertY) {
+        return code;
+      }
+      if (code === "ArrowUp") {
+        return "ArrowDown";
+      }
+      if (code === "ArrowDown") {
+        return "ArrowUp";
+      }
+      return code;
+    }
+
+    if (code === "ArrowUp") {
+      return game.settings.invertY ? "KeyS" : "KeyW";
+    }
+    if (code === "ArrowDown") {
+      return game.settings.invertY ? "KeyW" : "KeyS";
+    }
+    if (code === "ArrowLeft") {
+      return "KeyA";
+    }
+    if (code === "ArrowRight") {
+      return "KeyD";
+    }
+    return code;
+  }
+
   function onKeyDown(event) {
-    game.input.keyboardKeys[event.code] = true;
+    const mappedCode = mapControlCode(event.code);
+    game.input.keyboardKeys[mappedCode] = true;
     if (event.code === "Space" || event.code.indexOf("Arrow") === 0) {
       event.preventDefault();
     }
@@ -589,7 +727,7 @@
     }
     if (event.code === "KeyR") {
       if (game.state === "playing" || game.state === "briefing" || game.state === "result") {
-        showStageBriefing(game.stageIndex);
+        launchStage(game.stageIndex);
       }
     }
     if (event.code === "Escape") {
@@ -598,7 +736,8 @@
   }
 
   function onKeyUp(event) {
-    game.input.keyboardKeys[event.code] = false;
+    const mappedCode = mapControlCode(event.code);
+    game.input.keyboardKeys[mappedCode] = false;
   }
 
   function tick(timestamp) {
@@ -642,10 +781,6 @@
 
   function init() {
     buildStageCards();
-    dom.startButton.addEventListener("click", function () {
-      ensureAudio();
-      showStageBriefing(game.selectedStageIndex);
-    });
     dom.messagePrimary.addEventListener("click", function () {
       ensureAudio();
       game.uiActions.primary();
@@ -666,7 +801,8 @@
     }, { passive: false });
 
     setupTouchControls();
-    setupFixedTabs();
+    setupMenuTabs();
+    setupMenuControls();
     lockMobileLandscape();
 
     game.playSound = playSound;
