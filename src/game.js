@@ -32,7 +32,10 @@
     radarCanvas: document.getElementById("radar-canvas"),
     touchControls: document.getElementById("touch-controls"),
     touchStickFlight: document.getElementById("touch-stick-flight"),
-    touchStickMove: document.getElementById("touch-stick-move")
+    touchStickMove: document.getElementById("touch-stick-move"),
+    helpPanel: document.getElementById("help-panel"),
+    helpTab: document.getElementById("tab-help"),
+    menuTab: document.getElementById("tab-menu")
   };
 
   const game = {
@@ -73,6 +76,9 @@
 
   function setMenuVisible(visible) {
     setOverlayVisibility(dom.menuOverlay, visible);
+    if (visible) {
+      dom.helpPanel.classList.add("hidden");
+    }
   }
 
   function setMessageVisible(visible) {
@@ -129,6 +135,7 @@
     prepareStage(index);
     game.state = "briefing";
     setMenuVisible(false);
+    dom.helpPanel.classList.add("hidden");
     openMessage({
       eyebrow: game.currentStage.name,
       title: game.currentStage.shortName,
@@ -443,6 +450,36 @@
     dom.touchControls.querySelectorAll(".touch-button").forEach(bindTouchButton);
   }
 
+  function showStageMenu() {
+    closeMessage();
+    game.state = "menu";
+    dom.hud.classList.add("hidden");
+    setMenuVisible(true);
+    buildStageCards();
+  }
+
+  function setupFixedTabs() {
+    dom.helpTab.addEventListener("click", function () {
+      const hidden = dom.helpPanel.classList.toggle("hidden");
+      if (!hidden) {
+        setMenuVisible(false);
+        closeMessage();
+      }
+    });
+    dom.menuTab.addEventListener("click", function () {
+      dom.helpPanel.classList.add("hidden");
+      showStageMenu();
+    });
+  }
+
+  function lockMobileLandscape() {
+    const isTouch = window.matchMedia("(pointer: coarse)").matches;
+    if (!isTouch || !screen.orientation || !screen.orientation.lock) {
+      return;
+    }
+    screen.orientation.lock("landscape").catch(function () {});
+  }
+
   function onKeyDown(event) {
     game.input.keyboardKeys[event.code] = true;
     if (event.code === "Space" || event.code.indexOf("Arrow") === 0) {
@@ -457,10 +494,7 @@
       }
     }
     if (event.code === "Escape") {
-      closeMessage();
-      game.state = "menu";
-      dom.hud.classList.add("hidden");
-      setMenuVisible(true);
+      showStageMenu();
     }
   }
 
@@ -518,8 +552,16 @@
     window.addEventListener("resize", function () {
       game.renderer.resize();
     });
+    window.addEventListener("touchmove", function (event) {
+      event.preventDefault();
+    }, { passive: false });
+    window.addEventListener("gesturestart", function (event) {
+      event.preventDefault();
+    }, { passive: false });
 
     setupTouchControls();
+    setupFixedTabs();
+    lockMobileLandscape();
 
     dom.hud.classList.add("hidden");
     setMenuVisible(true);

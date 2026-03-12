@@ -21,6 +21,8 @@ body {
   margin: 0;
   min-height: 100%;
   overflow: hidden;
+  touch-action: none;
+  overscroll-behavior: none;
   font-family: "Segoe UI", "Hiragino Sans", sans-serif;
   background:
     radial-gradient(circle at top, rgba(55, 103, 170, 0.18), transparent 42%),
@@ -467,22 +469,66 @@ button {
   color: #d4e7ef;
 }
 
+.ui-tabs {
+  position: fixed;
+  right: 12px;
+  top: 12px;
+  z-index: 25;
+  display: flex;
+  gap: 8px;
+}
+
+.ui-tab-button {
+  border: 1px solid rgba(121, 224, 255, 0.35);
+  background: rgba(5, 19, 33, 0.78);
+  color: var(--text);
+  padding: 8px 12px;
+  border-radius: 10px;
+  min-height: 40px;
+}
+
+.help-panel {
+  position: fixed;
+  z-index: 24;
+  right: 12px;
+  top: 62px;
+  width: min(520px, calc(100vw - 24px));
+  padding: 16px;
+}
+
+.help-panel h3 {
+  margin: 0 0 12px;
+}
+
+.orientation-lock {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: none;
+  place-items: center;
+  text-align: center;
+  padding: 20px;
+  background: rgba(2, 9, 16, 0.94);
+  color: #e7f7ff;
+  font-size: 20px;
+  letter-spacing: 0.08em;
+}
+
 @media (max-width: 900px) {
   .hud {
-    padding: 10px;
+    padding: 8px;
   }
 
   .hud-top,
   .hud-bottom {
-    flex-direction: column;
+    flex-direction: row;
+    gap: 8px;
   }
 
   .hud-block,
-  .status-panel,
-  .radar-panel,
-  .telemetry-panel {
-    width: 100%;
+  .status-panel {
     min-width: 0;
+    width: auto;
   }
 
   .crosshair {
@@ -493,34 +539,34 @@ button {
     display: flex;
   }
 
-  .hud-bottom {
-    gap: 10px;
-  }
-
-  .status-panel,
-  .radar-panel,
-  .telemetry-panel {
-    padding: 10px 12px;
-  }
-
   .radar-panel,
   .telemetry-panel {
     display: none;
   }
 
-  .hud-top {
-    gap: 10px;
+  .ui-tabs {
+    right: 8px;
+    top: 8px;
+    gap: 6px;
   }
 
-  .hud-block {
-    padding: 10px 12px;
+  .ui-tab-button {
+    min-height: 34px;
+    padding: 6px 10px;
+    font-size: 12px;
   }
 
-  .value {
-    font-size: 18px;
+  .panel {
+    padding: 18px;
   }
-
 }
+
+@media (pointer: coarse) and (orientation: portrait) {
+  .orientation-lock {
+    display: grid;
+  }
+}
+
 .stage-card {
   text-align: left;
   color: var(--text);
