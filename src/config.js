@@ -85,9 +85,9 @@
       },
       {
         id: "harbor-spear",
-        name: "ステージ2 / 港湾強襲",
-        shortName: "港湾強襲",
-        objective: "敵艦隊を壊滅させ制海権を奪取せよ",
+        name: "ステージ2 / 大洋艦隊決戦",
+        shortName: "大洋艦隊決戦",
+        objective: "外洋で敵主力艦隊を撃滅し制海権を奪取せよ",
         completionLabel: "敵艦隊壊滅",
         environment: {
           skyTop: "#83a8d7",
@@ -96,18 +96,12 @@
           seaBottom: "#0a1320",
           haze: "rgba(255, 255, 255, 0.12)",
           sunColor: "rgba(255, 239, 181, 0.18)",
-          terrainType: "harbor"
+          terrainType: "open-ocean"
         },
         missionType: "eliminate_all",
         playerStart: { x: 0, y: 230, z: -380, yaw: 0, pitch: 0.02, roll: 0 },
         enemies: stage2Enemies,
-        obstacles: [
-          { type: "city", x: -560, z: 1510, radius: 230, height: 120 },
-          { type: "city", x: 560, z: 1510, radius: 230, height: 120 },
-          { type: "dock", x: 0, z: 1460, radius: 130, height: 60 },
-          { type: "island", x: -820, z: 1800, radius: 250, height: 180 },
-          { type: "island", x: 860, z: 1820, radius: 260, height: 190 }
-        ]
+        obstacles: []
       },
       {
         id: "mountain-crown",
