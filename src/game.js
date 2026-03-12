@@ -49,6 +49,12 @@
     feedback: {
       hitFlash: 0
     },
+    audio: {
+      context: null,
+      master: null,
+      enabled: false
+    },
+    previousLockId: null,
     input: {
       keys: {},
       keyboardKeys: {},
@@ -65,6 +71,108 @@
       secondary: function () {}
     }
   };
+
+
+  function ensureAudio() {
+    if (game.audio.context) {
+      return game.audio.enabled;
+    }
+    const AudioContextCtor = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextCtor) {
+      return false;
+    }
+    try {
+      const context = new AudioContextCtor();
+      const master = context.createGain();
+      master.gain.value = 0.2;
+      master.connect(context.destination);
+      game.audio.context = context;
+      game.audio.master = master;
+      game.audio.enabled = true;
+      return true;
+    } catch (error) {
+      game.audio.enabled = false;
+      return false;
+    }
+  }
+
+  function playSound(soundName, options) {
+    if (!ensureAudio()) {
+      return;
+    }
+
+    const context = game.audio.context;
+    if (context.state === "suspended") {
+      context.resume().catch(function () {});
+    }
+
+    const now = context.currentTime;
+    const volume = options && options.volume != null ? options.volume : 0.18;
+    const playbackRate = options && options.playbackRate != null ? options.playbackRate : 1;
+    const osc = context.createOscillator();
+    const gain = context.createGain();
+
+    osc.connect(gain);
+    gain.connect(game.audio.master);
+
+    if (soundName === "playerMissile") {
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(310 * playbackRate, now);
+      osc.frequency.exponentialRampToValueAtTime(120 * playbackRate, now + 0.12);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(volume, now + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+      osc.start(now);
+      osc.stop(now + 0.2);
+      return;
+    }
+
+    if (soundName === "targetLock") {
+      osc.type = "square";
+      osc.frequency.setValueAtTime(880 * playbackRate, now);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(volume, now + 0.012);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
+      osc.start(now);
+      osc.stop(now + 0.1);
+      return;
+    }
+
+    if (soundName === "playerHit") {
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(170 * playbackRate, now);
+      osc.frequency.exponentialRampToValueAtTime(90 * playbackRate, now + 0.1);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(volume, now + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.13);
+      osc.start(now);
+      osc.stop(now + 0.16);
+      return;
+    }
+
+    if (soundName === "enemyDown") {
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(260 * playbackRate, now);
+      osc.frequency.exponentialRampToValueAtTime(70 * playbackRate, now + 0.22);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(volume, now + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.24);
+      osc.start(now);
+      osc.stop(now + 0.26);
+      return;
+    }
+
+    if (soundName === "playerDown") {
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(180 * playbackRate, now);
+      osc.frequency.exponentialRampToValueAtTime(45 * playbackRate, now + 0.4);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(volume, now + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.42);
+      osc.start(now);
+      osc.stop(now + 0.45);
+    }
+  }
 
   function setOverlayVisibility(element, visible) {
     element.classList.toggle("overlay-visible", visible);
@@ -123,6 +231,7 @@
     game.input.keys = {};
     game.input.keyboardKeys = {};
     game.input.virtualKeys = {};
+    game.previousLockId = null;
     dom.hud.classList.remove("hidden");
     updateHud();
   }
@@ -475,6 +584,7 @@
       event.preventDefault();
     }
     if (event.code === "Space") {
+      ensureAudio();
       game.input.fireQueued = true;
     }
     if (event.code === "KeyR") {
@@ -511,6 +621,11 @@
       game.targetLock = Entities.acquireTargetLock(game);
       const result = Entities.update(game, dt);
       game.targetLock = Entities.acquireTargetLock(game);
+      const lockId = game.targetLock ? game.targetLock.id : null;
+      if (lockId && lockId !== game.previousLockId) {
+        playSound("targetLock", { volume: 0.12 });
+      }
+      game.previousLockId = lockId;
       updateHud();
       updateRadar();
       if (result.finished) {
@@ -528,9 +643,11 @@
   function init() {
     buildStageCards();
     dom.startButton.addEventListener("click", function () {
+      ensureAudio();
       showStageBriefing(game.selectedStageIndex);
     });
     dom.messagePrimary.addEventListener("click", function () {
+      ensureAudio();
       game.uiActions.primary();
     });
     dom.messageSecondary.addEventListener("click", function () {
@@ -551,6 +668,8 @@
     setupTouchControls();
     setupFixedTabs();
     lockMobileLandscape();
+
+    game.playSound = playSound;
 
     dom.hud.classList.add("hidden");
     setMenuVisible(true);

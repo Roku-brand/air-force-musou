@@ -46,8 +46,14 @@
     camera: {
       near: 1,
       fov: 500,
-      chaseDistance: 74,
-      chaseHeight: 20
+      cockpitForward: 10,
+      cockpitHeight: 6
+    },
+    targeting: {
+      maxLockDistance: 2200,
+      minAlignment: 0.62,
+      leadTime: 0.55,
+      lockStickinessBonus: 0.28
     },
     world: {
       ceiling: 920,
