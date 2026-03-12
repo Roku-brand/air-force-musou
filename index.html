@@ -12,7 +12,17 @@
 
     <div class="hud hidden" id="hud">
       <div class="hud-top">
-        <div class="hud-block">
+        <div class="status-strip hud-block">
+          <div class="status-item">
+            <span class="label">耐久</span>
+            <strong class="status-value" id="health-text">3 / 3</strong>
+          </div>
+          <div class="status-item">
+            <span class="label">ミサイル</span>
+            <strong class="status-value" id="ammo-text">20 / 20</strong>
+          </div>
+        </div>
+        <div class="hud-block hud-block-compact">
           <div class="label">任務</div>
           <div class="value" id="mission-name">-</div>
           <div class="sub" id="mission-objective">-</div>
@@ -33,23 +43,6 @@
       </div>
 
       <div class="hud-bottom">
-        <div class="status-panel">
-          <div class="meter">
-            <div class="meter-title">耐久</div>
-            <div class="meter-bar">
-              <div class="meter-fill meter-fill-health" id="health-fill"></div>
-            </div>
-            <div class="meter-value" id="health-text">3 / 3</div>
-          </div>
-          <div class="meter">
-            <div class="meter-title">ミサイル</div>
-            <div class="meter-bar">
-              <div class="meter-fill meter-fill-ammo" id="ammo-fill"></div>
-            </div>
-            <div class="meter-value" id="ammo-text">20 / 20</div>
-          </div>
-        </div>
-
         <div class="radar-panel">
           <div class="radar-title">戦術レーダー</div>
           <canvas id="radar-canvas" width="180" height="180"></canvas>
@@ -65,23 +58,13 @@
 
       <div class="touch-controls" id="touch-controls" aria-hidden="true">
         <div class="touch-stick" id="touch-stick-flight">
-          <div class="touch-stick-label">機体</div>
+          <div class="touch-stick-label">操縦</div>
           <div class="touch-stick-knob"></div>
         </div>
 
         <div class="touch-action-cluster">
-          <div class="touch-mini-grid">
-            <button class="touch-button" data-key="KeyA">ROLL L</button>
-            <button class="touch-button" data-key="KeyD">ROLL R</button>
-            <button class="touch-button" data-key="ShiftLeft">THR+</button>
-            <button class="touch-button" data-key="ControlLeft">THR-</button>
-          </div>
-          <button class="touch-button touch-button-fire" data-fire="true">FIRE</button>
-        </div>
-
-        <div class="touch-stick" id="touch-stick-move">
-          <div class="touch-stick-label">移動</div>
-          <div class="touch-stick-knob"></div>
+          <button class="touch-button touch-button-speed" data-key="ShiftLeft">速度</button>
+          <button class="touch-button touch-button-fire" data-fire="true">射撃</button>
         </div>
       </div>
     </div>
@@ -108,17 +91,13 @@
     <div class="panel help-panel hidden" id="help-panel">
       <h3>操作方法</h3>
       <div class="controls-grid">
-        <div><span>W / S</span>機首の上下</div>
-        <div><span>A / D</span>機体の左右傾き</div>
-        <div><span>Q / E</span>旋回</div>
-        <div><span>Shift / Ctrl</span>加速 / 減速</div>
-        <div><span>↑ ↓</span>上下移動</div>
-        <div><span>← →</span>左右移動</div>
-        <div><span>Space</span>ミサイル発射</div>
+        <div><span>↑ ↓ ← →</span>操縦（機体の進行）</div>
+        <div><span>Shift</span>速度（長押しで加速）</div>
+        <div><span>Space</span>射撃</div>
         <div><span>R / Esc</span>再出撃 / メニュー</div>
-        <div><span>左スティック</span>機首上下 / 旋回</div>
-        <div><span>右スティック</span>上下移動 / 左右移動</div>
-        <div><span>画面右ボタン</span>ロール / 加減速 / 発射</div>
+        <div><span>左スティック</span>操縦（上下左右）</div>
+        <div><span>右ボタン(速度)</span>長押しで加速</div>
+        <div><span>右ボタン(射撃)</span>ミサイル発射</div>
       </div>
     </div>
 

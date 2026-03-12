@@ -72,10 +72,10 @@ button {
   display: flex;
   justify-content: space-between;
   gap: 18px;
+  align-items: flex-start;
 }
 
 .hud-block,
-.status-panel,
 .radar-panel,
 .telemetry-panel,
 .panel {
@@ -86,12 +86,35 @@ button {
 }
 
 .hud-block {
-  min-width: 320px;
-  padding: 14px 16px;
+  min-width: 250px;
+  padding: 12px 14px;
 }
 
 .hud-block-right {
   text-align: right;
+}
+
+.hud-block-compact {
+  min-width: 210px;
+  max-width: 320px;
+}
+
+.status-strip {
+  min-width: 230px;
+  display: grid;
+  gap: 8px;
+}
+
+.status-item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.status-value {
+  font-size: 17px;
+  letter-spacing: 0.04em;
 }
 
 .label,
@@ -105,14 +128,14 @@ button {
 }
 
 .value {
-  font-size: 22px;
+  font-size: 17px;
   font-weight: 700;
   margin-top: 4px;
 }
 
 .sub {
-  font-size: 13px;
-  margin-top: 6px;
+  font-size: 11px;
+  margin-top: 4px;
   color: #b8d7e3;
 }
 
@@ -187,44 +210,9 @@ button {
   align-items: end;
 }
 
-.status-panel,
 .radar-panel,
 .telemetry-panel {
   padding: 14px 16px;
-}
-
-.status-panel {
-  width: 360px;
-}
-
-.meter + .meter {
-  margin-top: 14px;
-}
-
-.meter-bar {
-  height: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  margin-top: 8px;
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.meter-fill {
-  height: 100%;
-  width: 0;
-  transition: width 120ms linear;
-}
-
-.meter-fill-health {
-  background: linear-gradient(90deg, #ff6978, #ffad66);
-}
-
-.meter-fill-ammo {
-  background: linear-gradient(90deg, #75d9ff, #87ffbe);
-}
-
-.meter-value {
-  margin-top: 8px;
-  font-size: 13px;
 }
 
 .radar-panel {
@@ -312,15 +300,9 @@ button {
   pointer-events: auto;
 }
 
-.touch-mini-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
 .touch-button {
-  min-width: 64px;
-  min-height: 40px;
+  min-width: 88px;
+  min-height: 48px;
   padding: 6px 10px;
   border-radius: 10px;
   border: 1px solid rgba(121, 224, 255, 0.36);
@@ -337,9 +319,13 @@ button {
 }
 
 .touch-button-fire {
-  min-height: 52px;
+  min-height: 58px;
   font-size: 14px;
   font-weight: 700;
+}
+
+.touch-button-speed {
+  font-size: 13px;
 }
 .overlay {
   display: none;
@@ -526,7 +512,7 @@ button {
   }
 
   .hud-block,
-  .status-panel {
+  .status-strip {
     min-width: 0;
     width: auto;
   }
