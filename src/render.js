@@ -45,41 +45,53 @@
       ]
     },
     fighter: {
-      scale: 1.16,
+      scale: 1.12,
       vertices: [
-        [0, 0.4, 30],
-        [0, 2.4, 11],
-        [0, 1.8, -1],
-        [0, 0.8, -19],
-        [0, 6.4, -9],
-        [0, -1.6, -15],
-        [-25, 0.4, 3],
-        [25, 0.4, 3],
-        [-19, 0, -6],
-        [19, 0, -6],
-        [-8, -1.8, 9],
-        [8, -1.8, 9],
-        [-6, 4.8, -4],
-        [6, 4.8, -4],
-        [-3.5, 7.5, -11],
-        [3.5, 7.5, -11]
+        [0, 0.2, 34],
+        [0, 2.2, 16],
+        [0, 2.5, 2],
+        [0, 1.4, -12],
+        [0, 0.6, -26],
+        [0, 4.6, -10],
+        [0, -1.8, -16],
+        [-30, 0.5, 4],
+        [30, 0.5, 4],
+        [-26, 0.2, -6],
+        [26, 0.2, -6],
+        [-11, -2.1, 10],
+        [11, -2.1, 10],
+        [-8, 4.2, -4],
+        [8, 4.2, -4],
+        [-5, 6.2, -12],
+        [5, 6.2, -12],
+        [-16, 0.3, 18],
+        [16, 0.3, 18],
+        [-4, 2.4, 26],
+        [4, 2.4, 26],
+        [0, 8, -14]
       ],
       faces: [
-        { i: [0, 1, 10], color: "#d8e2ed" },
-        { i: [0, 11, 1], color: "#c5d4e3" },
-        { i: [10, 1, 2, 8], color: "#8ea2b6" },
-        { i: [1, 11, 9, 2], color: "#9cb1c6" },
-        { i: [8, 2, 3], color: "#65798d" },
-        { i: [2, 9, 3], color: "#73889e" },
-        { i: [1, 4, 2], color: "#5e7185" },
-        { i: [12, 13, 4], color: "#2d3f50" },
-        { i: [14, 12, 4], color: "#4a6074" },
-        { i: [13, 15, 4], color: "#546a7e" },
-        { i: [6, 10, 8, 3], color: "#76899d" },
-        { i: [11, 7, 3, 9], color: "#859ab1" },
-        { i: [6, 0, 10], color: "#d9704d" },
-        { i: [0, 7, 11], color: "#d9704d" },
-        { i: [8, 9, 5], color: "#425567" }
+        { i: [0, 19, 1], color: "#adb5a1" },
+        { i: [0, 1, 20], color: "#9fa894" },
+        { i: [19, 20, 1], color: "#7f8878" },
+        { i: [17, 0, 11], color: "#8a927f" },
+        { i: [0, 18, 12], color: "#96a089" },
+        { i: [11, 1, 2, 9], color: "#626c5f" },
+        { i: [1, 12, 10, 2], color: "#697365" },
+        { i: [2, 3, 9], color: "#525b50" },
+        { i: [2, 10, 3], color: "#5a6458" },
+        { i: [3, 4, 6], color: "#3d463f" },
+        { i: [1, 5, 2], color: "#596257" },
+        { i: [13, 14, 5], color: "#2f3832" },
+        { i: [15, 13, 5], color: "#444d44" },
+        { i: [14, 16, 5], color: "#4b564b" },
+        { i: [7, 17, 11], color: "#727a68" },
+        { i: [18, 8, 12], color: "#7c8570" },
+        { i: [7, 11, 9, 4], color: "#5d665a" },
+        { i: [12, 8, 4, 10], color: "#667062" },
+        { i: [15, 21, 5], color: "#58614f" },
+        { i: [5, 21, 16], color: "#616a56" },
+        { i: [9, 10, 6], color: "#384039" }
       ]
     },
     sam: {
@@ -281,13 +293,16 @@
     }
 
     if (terrain === "mountain") {
-      meshes.push(createPyramidMesh(-760, 0, 1320, 620, 220, ["#534c46", "#75695f", "#6b5f56", "#5c514a", "#4f4540"]));
-      meshes.push(createPyramidMesh(760, 0, 1320, 620, 220, ["#534c46", "#75695f", "#6b5f56", "#5c514a", "#4f4540"]));
-      meshes.push(createPyramidMesh(0, 0, 1900, 860, 340, ["#4b4543", "#675d5a", "#5f5653", "#544b49", "#463f3d"]));
-      meshes.push(createBoxMesh(0, 48, 1880, 260, 18, 180, ["#494450", "#8d8891", "#6a6570", "#5d5864", "#47424d", "#54505b"]));
-      clouds.push({ x: -460, y: 470, z: 980, size: 92 });
-      clouds.push({ x: 380, y: 420, z: 1260, size: 88 });
-      clouds.push({ x: 20, y: 520, z: 1700, size: 120 });
+      meshes.push(createPyramidMesh(0, 0, 1880, 760, 190, ["#6a745c", "#7f8a6f", "#768164", "#667156", "#59634a"]));
+      meshes.push(createPyramidMesh(-520, 0, 1260, 460, 126, ["#5f6a52", "#758061", "#6d785b", "#5f6b4e", "#535e45"]));
+      meshes.push(createPyramidMesh(520, 0, 1260, 460, 126, ["#5f6a52", "#758061", "#6d785b", "#5f6b4e", "#535e45"]));
+      meshes.push(createPyramidMesh(-230, 0, 1650, 280, 84, ["#66604f", "#7b735d", "#716a56", "#625b4a", "#574f41"]));
+      meshes.push(createPyramidMesh(230, 0, 1650, 280, 84, ["#66604f", "#7b735d", "#716a56", "#625b4a", "#574f41"]));
+      meshes.push(createBoxMesh(0, 40, 1880, 340, 20, 240, ["#52505a", "#9693a0", "#74717c", "#63606b", "#4e4b55", "#5b5863"]));
+      meshes.push(createBoxMesh(0, 18, 1760, 540, 8, 360, ["#3e473e", "#556056", "#4b554b", "#434c43", "#394239", "#454f45"]));
+      clouds.push({ x: -420, y: 430, z: 980, size: 92 });
+      clouds.push({ x: 360, y: 400, z: 1320, size: 88 });
+      clouds.push({ x: 40, y: 500, z: 1720, size: 120 });
     }
 
     terrainCache[stage.id] = { meshes: meshes, clouds: clouds };
@@ -583,7 +598,7 @@
       }
     }
 
-    function drawLockMarker(lock, camera) {
+    function drawLockMarker(lock, camera, clock) {
       if (!lock || !lock.alive) {
         return;
       }
@@ -591,9 +606,11 @@
       if (!projected) {
         return;
       }
-      const size = Math.max(18, 320 / projected.z * 30);
-      ctx.strokeStyle = "rgba(255, 232, 126, 0.92)";
-      ctx.lineWidth = 2;
+      const size = Math.max(24, 320 / projected.z * 34);
+      const pulse = 0.65 + Math.sin(clock * 12) * 0.35;
+
+      ctx.strokeStyle = "rgba(255, 232, 126, 0.98)";
+      ctx.lineWidth = 2.6;
       ctx.beginPath();
       ctx.moveTo(projected.x - size, projected.y - size * 0.65);
       ctx.lineTo(projected.x - size * 0.4, projected.y - size * 0.65);
@@ -608,6 +625,27 @@
       ctx.lineTo(projected.x + size * 0.4, projected.y + size * 0.65);
       ctx.lineTo(projected.x + size * 0.4, projected.y + size);
       ctx.stroke();
+
+      ctx.strokeStyle = "rgba(255, 90, 90, " + (0.5 + pulse * 0.45) + ")";
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.arc(projected.x, projected.y, size * (0.42 + pulse * 0.12), 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.strokeStyle = "rgba(255, 239, 170, 0.84)";
+      ctx.beginPath();
+      ctx.moveTo(projected.x - size * 0.24, projected.y);
+      ctx.lineTo(projected.x + size * 0.24, projected.y);
+      ctx.moveTo(projected.x, projected.y - size * 0.24);
+      ctx.lineTo(projected.x, projected.y + size * 0.24);
+      ctx.stroke();
+
+      ctx.fillStyle = "rgba(16, 18, 22, 0.66)";
+      ctx.fillRect(projected.x - 34, projected.y - size - 22, 68, 16);
+      ctx.fillStyle = "rgba(255, 224, 130, 0.95)";
+      ctx.font = "bold 11px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("LOCK", projected.x, projected.y - size - 10);
     }
 
     function render(game) {
@@ -664,7 +702,7 @@
 
       drawProjectiles(state.projectiles, camera);
       drawParticles(state.particles, camera);
-      drawLockMarker(game.targetLock, camera);
+      drawLockMarker(game.targetLock, camera, game.clock);
     }
 
     return {
