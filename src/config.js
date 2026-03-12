@@ -2,36 +2,30 @@
   const SkyDominion = window.SkyDominion || (window.SkyDominion = {});
 
   const stage1Enemies = [
-    { kind: "fighter", name: "敵戦闘機 アルファ", x: -520, y: 230, z: 420, yaw: 2.8 },
-    { kind: "fighter", name: "敵戦闘機 ベータ", x: 480, y: 250, z: 600, yaw: 3.2 },
-    { kind: "fighter", name: "敵戦闘機 ガンマ", x: -180, y: 210, z: 860, yaw: 3.1 },
-    { kind: "fighter", name: "敵戦闘機 デルタ", x: 120, y: 240, z: 980, yaw: 3.05 },
-    { kind: "sam", name: "沿岸SAM-1", x: -640, y: 18, z: 1020 },
-    { kind: "sam", name: "沿岸SAM-2", x: 620, y: 18, z: 1260 }
+    { kind: "fighter", name: "敵戦闘機 アルファ", x: -920, y: 250, z: 840, yaw: 2.8 },
+    { kind: "fighter", name: "敵戦闘機 ベータ", x: 860, y: 290, z: 1060, yaw: 3.2 },
+    { kind: "fighter", name: "敵戦闘機 ガンマ", x: -420, y: 240, z: 1360, yaw: 3.1 },
+    { kind: "fighter", name: "敵戦闘機 デルタ", x: 360, y: 300, z: 1520, yaw: 3.05 },
+    { kind: "fighter", name: "敵戦闘機 イプシロン", x: -120, y: 340, z: 1780, yaw: 3.02 }
   ];
 
   const stage2Enemies = [
-    { kind: "flagship", name: "敵主艦 オケアノス", x: 0, y: 8, z: 1680, hp: 4 },
-    { kind: "battleship", name: "護衛艦 ヒュドラ", x: -360, y: 8, z: 1520, hp: 2 },
-    { kind: "battleship", name: "護衛艦 ネレウス", x: 360, y: 8, z: 1540, hp: 2 },
-    { kind: "fighter", name: "迎撃機 ランス1", x: -620, y: 260, z: 1080, yaw: 3.1 },
-    { kind: "fighter", name: "迎撃機 ランス2", x: -140, y: 240, z: 920, yaw: 3.0 },
-    { kind: "fighter", name: "迎撃機 ランス3", x: 140, y: 240, z: 920, yaw: 3.2 },
-    { kind: "fighter", name: "迎撃機 ランス4", x: 620, y: 260, z: 1080, yaw: 3.2 },
-    { kind: "sam", name: "艦載SAM 左舷", x: -480, y: 12, z: 1400 },
-    { kind: "sam", name: "艦載SAM 右舷", x: 480, y: 12, z: 1420 }
+    { kind: "fighter", name: "迎撃機 ランス1", x: -980, y: 320, z: 1280, yaw: 3.1 },
+    { kind: "fighter", name: "迎撃機 ランス2", x: -520, y: 300, z: 1120, yaw: 3.0 },
+    { kind: "fighter", name: "迎撃機 ランス3", x: 520, y: 300, z: 1120, yaw: 3.2 },
+    { kind: "fighter", name: "迎撃機 ランス4", x: 980, y: 320, z: 1280, yaw: 3.2 },
+    { kind: "fighter", name: "迎撃機 ランス5", x: -260, y: 360, z: 1680, yaw: 3.12 },
+    { kind: "fighter", name: "迎撃機 ランス6", x: 260, y: 360, z: 1680, yaw: 3.08 }
   ];
 
   const stage3Enemies = [
-    { kind: "hq", name: "敵司令本部 バスティオン", x: 0, y: 70, z: 1880, hp: 5 },
-    { kind: "sam", name: "山稜SAM-1", x: -520, y: 36, z: 1260 },
-    { kind: "sam", name: "山稜SAM-2", x: 520, y: 36, z: 1260 },
-    { kind: "sam", name: "内周SAM-1", x: -220, y: 52, z: 1660 },
-    { kind: "sam", name: "内周SAM-2", x: 220, y: 52, z: 1660 },
-    { kind: "fighter", name: "防空機 タロン1", x: -760, y: 320, z: 1320, yaw: 3.05 },
-    { kind: "fighter", name: "防空機 タロン2", x: 760, y: 320, z: 1320, yaw: 3.25 },
-    { kind: "fighter", name: "防空機 タロン3", x: -160, y: 280, z: 1040, yaw: 3.05 },
-    { kind: "fighter", name: "防空機 タロン4", x: 160, y: 280, z: 1040, yaw: 3.2 }
+    { kind: "fighter", name: "防空機 タロン1", x: -1240, y: 420, z: 1520, yaw: 3.05 },
+    { kind: "fighter", name: "防空機 タロン2", x: 1240, y: 420, z: 1520, yaw: 3.25 },
+    { kind: "fighter", name: "防空機 タロン3", x: -580, y: 360, z: 1320, yaw: 3.05 },
+    { kind: "fighter", name: "防空機 タロン4", x: 580, y: 360, z: 1320, yaw: 3.2 },
+    { kind: "fighter", name: "防空機 タロン5", x: -220, y: 440, z: 1980, yaw: 3.12 },
+    { kind: "fighter", name: "防空機 タロン6", x: 220, y: 440, z: 1980, yaw: 3.08 },
+    { kind: "fighter", name: "防空機 タロン7", x: 0, y: 500, z: 2320, yaw: 3.14 }
   ];
 
   SkyDominion.CONFIG = {
@@ -56,17 +50,17 @@
       chaseHeight: 20
     },
     world: {
-      ceiling: 660,
-      floor: 8,
+      ceiling: 920,
+      floor: 0,
       oceanLevel: 0,
-      radarRange: 2200
+      radarRange: 4200
     },
     stages: [
       {
         id: "coastal-intercept",
         name: "ステージ1 / 沿岸迎撃戦",
         shortName: "沿岸迎撃戦",
-        objective: "沿岸の戦闘機隊とSAM陣地を全滅させろ",
+        objective: "沿岸空域を巡回する敵戦闘機隊を全滅させろ",
         completionLabel: "全目標の無力化",
         environment: {
           skyTop: "#5f84b6",
@@ -85,8 +79,8 @@
         id: "harbor-spear",
         name: "ステージ2 / 港湾強襲",
         shortName: "港湾強襲",
-        objective: "護衛網を突破して敵主艦を撃沈せよ",
-        completionLabel: "主艦撃沈",
+        objective: "広域哨戒中の迎撃飛行隊を殲滅せよ",
+        completionLabel: "迎撃飛行隊壊滅",
         environment: {
           skyTop: "#83a8d7",
           skyBottom: "#f0d099",
@@ -96,8 +90,7 @@
           sunColor: "rgba(255, 239, 181, 0.18)",
           terrainType: "harbor"
         },
-        missionType: "destroy_flagship",
-        primaryTargetName: "敵主艦 オケアノス",
+        missionType: "eliminate_all",
         playerStart: { x: 0, y: 230, z: -380, yaw: 0, pitch: 0.02, roll: 0 },
         enemies: stage2Enemies
       },
@@ -105,8 +98,8 @@
         id: "mountain-crown",
         name: "ステージ3 / 山岳司令部",
         shortName: "山岳司令部",
-        objective: "山岳本部を破壊し最終防衛線を崩壊させろ",
-        completionLabel: "司令本部壊滅",
+        objective: "最終防衛飛行隊を撃破し制空権を確保せよ",
+        completionLabel: "最終防衛飛行隊壊滅",
         environment: {
           skyTop: "#95a2d3",
           skyBottom: "#edb386",
@@ -116,8 +109,7 @@
           sunColor: "rgba(255, 244, 210, 0.15)",
           terrainType: "mountain"
         },
-        missionType: "destroy_hq",
-        primaryTargetName: "敵司令本部 バスティオン",
+        missionType: "eliminate_all",
         playerStart: { x: 0, y: 260, z: -440, yaw: 0, pitch: 0.01, roll: 0 },
         enemies: stage3Enemies
       }

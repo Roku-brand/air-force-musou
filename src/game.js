@@ -135,7 +135,7 @@
     openMessage({
       eyebrow: game.currentStage.name,
       title: game.currentStage.shortName,
-      body: game.currentStage.objective + " 体力は3発で撃墜、ミサイルは20発まで搭載、3秒ごとに1発補充です。矢印キーで上下左右に移動できます。",
+      body: game.currentStage.objective + " 体力は3発で撃墜、ミサイルは20発まで搭載、3秒ごとに1発補充です。高度0mで墜落判定、矢印キーで上下左右に移動できます。",
       primaryLabel: "出撃",
       secondaryLabel: "ステージ選択",
       onPrimary: function () {
