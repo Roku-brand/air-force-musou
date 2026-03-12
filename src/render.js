@@ -269,7 +269,7 @@
         { i: [38, 39, 40], color: "#d4dde6" },
         { i: [41, 42, 43], color: "#d1dbe5" },
         { i: [44, 45, 46], color: "#ced8e2" },
-        { i: [47, 48, 49], color: "#c8d3df" }
+        { i: [46, 47, 48], color: "#c8d3df" }
       ]
     },
     hq: {
@@ -596,6 +596,9 @@
       }
       const modelKey = entity.kind === "player" ? "player" : entity.kind;
       const model = MODELS[modelKey];
+      if (!model) {
+        return;
+      }
       const offset = entity.pos;
       const vertices = model.vertices.map(function (vertex) {
         const scaled = { x: vertex[0] * model.scale, y: vertex[1] * model.scale, z: vertex[2] * model.scale };
