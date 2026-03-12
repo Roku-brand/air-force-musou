@@ -352,8 +352,8 @@
     const flight = touch.flightStick;
     setVirtualKey("ArrowLeft", flight.x < -threshold);
     setVirtualKey("ArrowRight", flight.x > threshold);
-    setVirtualKey("ArrowUp", flight.y > threshold);
-    setVirtualKey("ArrowDown", flight.y < -threshold);
+    setVirtualKey("ArrowUp", flight.y < -threshold);
+    setVirtualKey("ArrowDown", flight.y > threshold);
 
     setVirtualKey("KeyW", false);
     setVirtualKey("KeyS", false);
