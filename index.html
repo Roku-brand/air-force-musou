@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>空軍無双</title>
   <link rel="stylesheet" href="./styles.css">
 </head>
@@ -90,23 +90,7 @@
       <div class="panel hero-panel">
         <div class="eyebrow">三次元 空戦シミュレーション</div>
         <h1>空軍無双</h1>
-        <p class="lead">
-          3つの作戦空域を突破し、敵戦闘機、戦艦、地対空ミサイル網、司令本部を制圧せよ。
-        </p>
-
-        <div class="controls-grid">
-          <div><span>W / S</span>機首の上下</div>
-          <div><span>A / D</span>機体の左右傾き</div>
-          <div><span>Q / E</span>旋回</div>
-          <div><span>Shift / Ctrl</span>加速 / 減速</div>
-          <div><span>↑ ↓</span>上下移動</div>
-          <div><span>← →</span>左右移動</div>
-          <div><span>Space</span>ミサイル発射</div>
-          <div><span>R / Esc</span>再出撃 / メニュー</div>
-          <div><span>左スティック</span>機首上下 / 旋回</div>
-          <div><span>右スティック</span>上下移動 / 左右移動</div>
-          <div><span>画面右ボタン</span>ロール / 加減速 / 発射</div>
-        </div>
+        <p class="lead">ステージを選択して出撃してください。</p>
 
         <div class="stage-cards" id="stage-cards"></div>
 
@@ -115,6 +99,30 @@
         </div>
       </div>
     </div>
+
+    <div class="ui-tabs">
+      <button class="ui-tab-button" id="tab-help" type="button">操作方法</button>
+      <button class="ui-tab-button" id="tab-menu" type="button">ステージ選択</button>
+    </div>
+
+    <div class="panel help-panel hidden" id="help-panel">
+      <h3>操作方法</h3>
+      <div class="controls-grid">
+        <div><span>W / S</span>機首の上下</div>
+        <div><span>A / D</span>機体の左右傾き</div>
+        <div><span>Q / E</span>旋回</div>
+        <div><span>Shift / Ctrl</span>加速 / 減速</div>
+        <div><span>↑ ↓</span>上下移動</div>
+        <div><span>← →</span>左右移動</div>
+        <div><span>Space</span>ミサイル発射</div>
+        <div><span>R / Esc</span>再出撃 / メニュー</div>
+        <div><span>左スティック</span>機首上下 / 旋回</div>
+        <div><span>右スティック</span>上下移動 / 左右移動</div>
+        <div><span>画面右ボタン</span>ロール / 加減速 / 発射</div>
+      </div>
+    </div>
+
+    <div class="orientation-lock" id="orientation-lock">スマホは横画面でプレイしてください</div>
 
     <div class="overlay" id="message-overlay">
       <div class="panel message-panel">
