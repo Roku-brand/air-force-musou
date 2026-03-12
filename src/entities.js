@@ -135,6 +135,13 @@
     };
   }
 
+  function playSound(game, soundName, options) {
+    if (!game || typeof game.playSound !== "function") {
+      return;
+    }
+    game.playSound(soundName, options || {});
+  }
+
   function firePlayerMissile(game) {
     const state = game.stageState;
     const player = state.player;
@@ -164,6 +171,7 @@
     player.ammo -= 1;
     player.missileCooldown = CONFIG.player.missileCooldown;
     player.afterburner = 0.18;
+    playSound(game, "playerMissile", { volume: 0.18, playbackRate: 1.12 });
     return true;
   }
 
@@ -226,6 +234,8 @@
       createExplosion(player.pos, "rgba(255, 110, 110, 0.85)", 8, 46, 0.55)
     );
 
+    playSound(game, "playerHit", { volume: 0.2, playbackRate: 0.95 + Math.random() * 0.1 });
+
     if (player.health <= 0) {
       player.health = 0;
       player.alive = false;
@@ -233,6 +243,7 @@
         game.stageState.particles,
         createExplosion(player.pos, "rgba(255, 174, 86, 0.9)", 26, 120, 1.25)
       );
+      playSound(game, "playerDown", { volume: 0.32, playbackRate: 0.9 });
     }
   }
 
@@ -258,6 +269,7 @@
         game.stageState.particles,
         createExplosion(enemy.pos, "rgba(255, 176, 72, 0.92)", burstCount, burstSpeed, 1.1)
       );
+      playSound(game, "enemyDown", { volume: 0.2, playbackRate: 0.88 + Math.random() * 0.18 });
     }
   }
 
@@ -495,10 +507,15 @@
       const offset = Math3D.sub(enemy.pos, player.pos);
       const distance = Math3D.length(offset);
       const alignment = Math3D.dot(Math3D.normalize(offset), basis.forward);
-      if (distance > 1500 || alignment < 0.78) {
+      if (distance > CONFIG.targeting.maxLockDistance || alignment < CONFIG.targeting.minAlignment) {
         continue;
       }
-      const score = alignment * 2 - distance / 1700;
+      const predictedEnemyPos = Math3D.add(enemy.pos, Math3D.scale(Math3D.sub(enemy.pos, enemy.prevPos), CONFIG.targeting.leadTime));
+      const predictedOffset = Math3D.sub(predictedEnemyPos, player.pos);
+      const predictedAlignment = Math3D.dot(Math3D.normalize(predictedOffset), basis.forward);
+      const baseScore = predictedAlignment * 2.45 - distance / (CONFIG.targeting.maxLockDistance * 0.82);
+      const stickyBonus = game.targetLock && game.targetLock.id === enemy.id ? CONFIG.targeting.lockStickinessBonus : 0;
+      const score = baseScore + stickyBonus;
       if (score > bestScore) {
         bestScore = score;
         best = enemy;

@@ -337,8 +337,8 @@
       const lookPitch = player.pitch * 0.92 + (player.cameraPitchBias || 0);
       const basis = Math3D.basisFromAngles(lookPitch, player.yaw, player.roll * 0.65);
       const pos = Math3D.add(
-        Math3D.sub(player.pos, Math3D.scale(basis.forward, CONFIG.camera.chaseDistance)),
-        Math3D.scale(basis.up, CONFIG.camera.chaseHeight)
+        Math3D.add(player.pos, Math3D.scale(basis.forward, CONFIG.camera.cockpitForward)),
+        Math3D.scale(basis.up, CONFIG.camera.cockpitHeight)
       );
       return {
         pos: pos,
@@ -671,7 +671,6 @@
       for (let i = 0; i < terrain.meshes.length; i += 1) {
         pushMeshPolygons(polygons, terrain.meshes[i], camera, 0);
       }
-      pushEntityPolygons(polygons, player, camera);
       for (let i = 0; i < state.enemies.length; i += 1) {
         const enemy = state.enemies[i];
         if (enemy.alive) {
