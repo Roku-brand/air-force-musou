@@ -10,6 +10,7 @@
 <body>
   <div class="app-shell">
     <canvas id="game-canvas" aria-label="3D空戦シミュレーション"></canvas>
+    <canvas id="three-layer" aria-hidden="true"></canvas>
 
     <div class="hud hidden" id="hud">
       <div class="hud-top">
@@ -158,6 +159,7 @@
   </div>
 
   <script src="./src/config.js"></script>
+  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
   <script src="./src/math.js"></script>
   <script src="./src/entities.js"></script>
   <script src="./src/render.js"></script>
