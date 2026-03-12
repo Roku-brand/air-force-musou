@@ -130,7 +130,7 @@
     if (length(right) < 0.001) {
       right = { x: 1, y: 0, z: 0 };
     }
-    let up = normalize(cross(right, forward));
+    let up = normalize(cross(forward, right));
     if (roll) {
       right = rotateAroundAxis(right, forward, roll);
       up = rotateAroundAxis(up, forward, roll);
@@ -162,4 +162,3 @@
     basisFromAngles
   };
 })();
-
