@@ -553,7 +553,7 @@
         const worldPoints = face.i.map(function (index) {
           return vertices[index];
         });
-        if (worldPoints.length < 3) {
+        if (worldPoints.length < 3 || worldPoints.indexOf(undefined) !== -1) {
           continue;
         }
 
@@ -608,6 +608,9 @@
         const worldPoints = face.i.map(function (index) {
           return vertices[index];
         });
+        if (worldPoints.length < 3 || worldPoints.indexOf(undefined) !== -1) {
+          continue;
+        }
         const normal = Math3D.cross(Math3D.sub(worldPoints[1], worldPoints[0]), Math3D.sub(worldPoints[2], worldPoints[0]));
         const toCamera = Math3D.sub(camera.pos, worldPoints[0]);
         if (Math3D.dot(normal, toCamera) <= 0) {
