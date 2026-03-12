@@ -356,13 +356,34 @@
     setMessageVisible(false);
   }
 
+  function buildStageCardVisual(stage) {
+    if (stage.id !== "harbor-spear") {
+      return "";
+    }
+
+    return [
+      '<div class="stage-card-visual stage-card-visual-warship" aria-hidden="true">',
+      '  <div class="enemy-warship enemy-warship-battleship">',
+      '    <div class="enemy-warship-shadow"></div>',
+      '    <div class="enemy-warship-hull"></div>',
+      '    <div class="enemy-warship-deck"></div>',
+      '    <div class="enemy-warship-bridge"></div>',
+      '    <div class="enemy-warship-turret enemy-warship-turret-front"></div>',
+      '    <div class="enemy-warship-turret enemy-warship-turret-mid"></div>',
+      '    <div class="enemy-warship-rim"></div>',
+      '  </div>',
+      '</div>'
+    ].join("");
+  }
+
   function buildStageCards() {
     dom.stageCards.innerHTML = "";
     CONFIG.stages.forEach(function (stage, index) {
       const card = document.createElement("button");
       card.type = "button";
       card.className = "stage-card" + (index === game.selectedStageIndex ? " stage-card-active" : "");
-      card.innerHTML = "<h3>" + stage.shortName + "</h3><p>" + stage.objective + "</p><span class=\"stage-tag\">" + stage.completionLabel + "</span>";
+      card.innerHTML = buildStageCardVisual(stage)
+        + "<h3>" + stage.shortName + "</h3><p>" + stage.objective + "</p><span class=\"stage-tag\">" + stage.completionLabel + "</span>";
       card.addEventListener("click", function () {
         game.selectedStageIndex = index;
         buildStageCards();
