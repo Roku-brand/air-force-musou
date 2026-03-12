@@ -568,6 +568,10 @@
   }
 
   function bindTouchButton(button) {
+    if (!button) {
+      return;
+    }
+
     const key = button.dataset.key;
     const isFire = button.dataset.fire === "true";
 
@@ -604,6 +608,10 @@
   }
 
   function bindTouchStick(stick) {
+    if (!stick || !stick.element) {
+      return;
+    }
+
     const element = stick.element;
     element.addEventListener("pointerdown", function (event) {
       event.preventDefault();
@@ -634,6 +642,10 @@
   function setupTouchControls() {
     const isTouch = window.matchMedia("(pointer: coarse)").matches;
     game.input.touch.enabled = isTouch;
+    if (!dom.touchControls) {
+      return;
+    }
+
     dom.touchControls.style.display = isTouch ? "flex" : "none";
     if (!isTouch) {
       return;
