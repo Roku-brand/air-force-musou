@@ -55,6 +55,7 @@
   function createEnemy(definition) {
     const stats = ENEMY_STATS[definition.kind];
     const hp = definition.hp || stats.hp;
+    const speed = definition.speed || stats.speed;
     return {
       id: nextId(definition.kind),
       kind: definition.kind,
@@ -66,7 +67,7 @@
       pitch: definition.pitch || 0,
       yaw: definition.yaw || Math.PI,
       roll: definition.roll || 0,
-      speed: definition.speed || stats.speed,
+      speed: speed * randomRange(0.9, 1.12),
       hp,
       maxHp: hp,
       radius: stats.radius,
@@ -77,7 +78,11 @@
       orbitSign: Math.random() > 0.5 ? 1 : -1,
       weaveSeed: Math.random() * Math.PI * 2,
       formationOffset: Math.random() * Math.PI * 2,
-      preferredRange: randomRange(360, 620),
+      preferredRange: randomRange(480, 980),
+      formationRate: randomRange(0.14, 0.35),
+      verticalRate: randomRange(0.3, 0.95),
+      verticalAmplitude: randomRange(90, 260),
+      lateralSpread: randomRange(80, 340),
       damageFlash: 0,
       bob: Math.random() * Math.PI * 2
     };
@@ -338,11 +343,12 @@
     const stageTime = game.stageState.stageTime;
     enemy.prevPos = Math3D.vec3(enemy.pos.x, enemy.pos.y, enemy.pos.z);
 
-    const ringAngle = stageTime * 0.22 + enemy.formationOffset + (formationIndex / Math.max(1, formationCount)) * Math.PI * 2;
+    const ringAngle = stageTime * enemy.formationRate + enemy.formationOffset + (formationIndex / Math.max(1, formationCount)) * Math.PI * 2;
+    const lateralPhase = stageTime * (enemy.formationRate * 1.9) + enemy.weaveSeed;
     const targetPoint = {
-      x: player.pos.x + Math.cos(ringAngle) * enemy.preferredRange,
-      y: Math3D.clamp(player.pos.y + Math.sin(stageTime * 0.55 + enemy.weaveSeed) * 120, 120, 520),
-      z: player.pos.z + Math.sin(ringAngle) * enemy.preferredRange
+      x: player.pos.x + Math.cos(ringAngle) * enemy.preferredRange + Math.cos(lateralPhase) * enemy.lateralSpread,
+      y: Math3D.clamp(player.pos.y + Math.sin(stageTime * enemy.verticalRate + enemy.weaveSeed) * enemy.verticalAmplitude, 120, 520),
+      z: player.pos.z + Math.sin(ringAngle) * enemy.preferredRange + Math.sin(lateralPhase * 1.23) * enemy.lateralSpread
     };
 
     const offset = Math3D.sub(targetPoint, enemy.pos);
@@ -596,4 +602,3 @@
     getAliveEnemies
   };
 })();
-
