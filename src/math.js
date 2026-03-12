@@ -59,14 +59,11 @@
   }
 
   function wrapAngle(angle) {
-    let result = angle;
-    while (result > Math.PI) {
-      result -= Math.PI * 2;
+    if (!Number.isFinite(angle)) {
+      return 0;
     }
-    while (result < -Math.PI) {
-      result += Math.PI * 2;
-    }
-    return result;
+    const cycle = Math.PI * 2;
+    return ((angle + Math.PI) % cycle + cycle) % cycle - Math.PI;
   }
 
   function approachAngle(current, target, maxStep) {
