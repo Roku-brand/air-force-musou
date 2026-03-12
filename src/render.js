@@ -5,6 +5,7 @@
 
   const terrainCache = {};
   const NAVAL_KINDS = { battleship: true, carrier: true, flagship: true };
+  const THREE_MODEL_KINDS = { fighter: true, sam: true, hq: true };
 
   const MODELS = {
     player: {
@@ -440,9 +441,73 @@
       renderer: renderer,
       scene: scene,
       camera: camera,
+      materials: new Map(),
       ships: new Map(),
-      activeShipKeys: []
+      entities: new Map(),
+      activeShipKeys: [],
+      activeEntityKeys: [],
+      terrainRoot: null,
+      terrainStageId: null
     };
+  }
+
+  function getThreeMaterial(threeState, hex) {
+    if (threeState.materials.has(hex)) {
+      return threeState.materials.get(hex);
+    }
+    const mat = new threeState.THREE.MeshStandardMaterial({
+      color: hex,
+      roughness: 0.86,
+      metalness: 0.06,
+      flatShading: true
+    });
+    threeState.materials.set(hex, mat);
+    return mat;
+  }
+
+  function addFaceMesh(threeState, group, vertices, face, scale) {
+    if (!face.i || face.i.length < 3) {
+      return;
+    }
+    const THREE = threeState.THREE;
+    const positions = [];
+    for (let i = 1; i < face.i.length - 1; i += 1) {
+      const a = vertices[face.i[0]];
+      const b = vertices[face.i[i]];
+      const c = vertices[face.i[i + 1]];
+      if (!a || !b || !c) {
+        continue;
+      }
+      positions.push(
+        a[0] * scale, a[1] * scale, a[2] * scale,
+        b[0] * scale, b[1] * scale, b[2] * scale,
+        c[0] * scale, c[1] * scale, c[2] * scale
+      );
+    }
+    if (!positions.length) {
+      return;
+    }
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+    geometry.computeVertexNormals();
+    group.add(new THREE.Mesh(geometry, getThreeMaterial(threeState, face.color || "#8b95a5")));
+  }
+
+  function createModelThreeGroup(threeState, model) {
+    const group = new threeState.THREE.Group();
+    for (let i = 0; i < model.faces.length; i += 1) {
+      addFaceMesh(threeState, group, model.vertices, model.faces[i], model.scale || 1);
+    }
+    return group;
+  }
+
+  function createTerrainMeshGroup(threeState, mesh) {
+    const group = new threeState.THREE.Group();
+    for (let i = 0; i < mesh.faces.length; i += 1) {
+      addFaceMesh(threeState, group, mesh.vertices, mesh.faces[i], 1);
+    }
+    group.position.set(mesh.pos.x, mesh.pos.y, mesh.pos.z);
+    return group;
   }
 
   function hexToRgb(hex) {
@@ -1057,45 +1122,89 @@
       threeCam.lookAt(target);
     }
 
-    function renderNavalThreeLayer(enemies, cameraBasis) {
+    function syncTerrainThreeLayer(stage, terrain) {
+      if (!renderer.three) {
+        return;
+      }
+      const threeState = renderer.three;
+      if (threeState.terrainStageId === stage.id && threeState.terrainRoot) {
+        return;
+      }
+      if (threeState.terrainRoot) {
+        threeState.scene.remove(threeState.terrainRoot);
+      }
+      const root = new threeState.THREE.Group();
+      for (let i = 0; i < terrain.meshes.length; i += 1) {
+        root.add(createTerrainMeshGroup(threeState, terrain.meshes[i]));
+      }
+      threeState.scene.add(root);
+      threeState.terrainRoot = root;
+      threeState.terrainStageId = stage.id;
+    }
+
+    function renderThreeLayer(stage, terrain, enemies, cameraBasis) {
       if (!renderer.three) {
         return;
       }
       const threeState = renderer.three;
       syncThreeCamera(cameraBasis);
+      syncTerrainThreeLayer(stage, terrain);
 
       threeState.activeShipKeys.length = 0;
+      threeState.activeEntityKeys.length = 0;
       for (let i = 0; i < enemies.length; i += 1) {
         const enemy = enemies[i];
-        if (!enemy.alive || !NAVAL_KINDS[enemy.kind]) {
+        if (!enemy.alive) {
           continue;
         }
         const key = enemy.id || (enemy.name + "-" + enemy.kind + "-" + i);
-        let ship = threeState.ships.get(key);
-        if (!ship) {
-          ship = createNavalShipGroup(threeState.THREE, enemy.kind);
-          threeState.scene.add(ship);
-          threeState.ships.set(key, ship);
-        }
-
         const distance = Math3D.length(Math3D.sub(enemy.pos, cameraBasis.pos));
-        const lodScale = Math3D.clamp(1.12 - distance / 4800, 0.84, 1.1);
-        const typeScale = enemy.kind === "carrier" ? 1.42 : enemy.kind === "flagship" ? 1.6 : 1.18;
-        ship.scale.setScalar(typeScale * lodScale);
-        ship.position.set(enemy.pos.x, enemy.pos.y + 0.4, enemy.pos.z);
-        ship.rotation.set(enemy.pitch * 0.35, enemy.yaw, enemy.roll * 0.5);
 
-        const shadow = ship.children[ship.children.length - 1];
-        if (shadow) {
-          shadow.scale.set(24 * typeScale, 13 * typeScale, 1);
-          shadow.material.opacity = Math3D.clamp(0.3 - distance / 9000, 0.08, 0.26);
+        if (NAVAL_KINDS[enemy.kind]) {
+          let ship = threeState.ships.get(key);
+          if (!ship) {
+            ship = createNavalShipGroup(threeState.THREE, enemy.kind);
+            threeState.scene.add(ship);
+            threeState.ships.set(key, ship);
+          }
+          const lodScale = Math3D.clamp(1.12 - distance / 4800, 0.84, 1.1);
+          const typeScale = enemy.kind === "carrier" ? 1.42 : enemy.kind === "flagship" ? 1.6 : 1.18;
+          ship.scale.setScalar(typeScale * lodScale);
+          ship.position.set(enemy.pos.x, enemy.pos.y + 0.4, enemy.pos.z);
+          ship.rotation.set(enemy.pitch * 0.35, enemy.yaw, enemy.roll * 0.5);
+
+          const shadow = ship.children[ship.children.length - 1];
+          if (shadow) {
+            shadow.scale.set(24 * typeScale, 13 * typeScale, 1);
+            shadow.material.opacity = Math3D.clamp(0.3 - distance / 9000, 0.08, 0.26);
+          }
+
+          threeState.activeShipKeys.push(key);
+          continue;
         }
 
-        threeState.activeShipKeys.push(key);
+        if (!THREE_MODEL_KINDS[enemy.kind]) {
+          continue;
+        }
+
+        let entityMesh = threeState.entities.get(key);
+        if (!entityMesh) {
+          entityMesh = createModelThreeGroup(threeState, MODELS[enemy.kind]);
+          threeState.scene.add(entityMesh);
+          threeState.entities.set(key, entityMesh);
+        }
+        const lodScale = Math3D.clamp(1.16 - distance / 5200, 0.82, 1.05);
+        entityMesh.scale.setScalar(lodScale);
+        entityMesh.position.set(enemy.pos.x, enemy.pos.y, enemy.pos.z);
+        entityMesh.rotation.set(enemy.pitch, enemy.yaw, enemy.roll);
+        threeState.activeEntityKeys.push(key);
       }
 
       threeState.ships.forEach(function (mesh, key) {
         mesh.visible = threeState.activeShipKeys.indexOf(key) !== -1;
+      });
+      threeState.entities.forEach(function (mesh, key) {
+        mesh.visible = threeState.activeEntityKeys.indexOf(key) !== -1;
       });
 
       threeState.renderer.render(threeState.scene, threeState.camera);
@@ -1116,12 +1225,14 @@
       drawClouds(terrain.clouds, camera);
 
       const polygons = [];
-      for (let i = 0; i < terrain.meshes.length; i += 1) {
-        pushMeshPolygons(polygons, terrain.meshes[i], camera, 0);
+      if (!renderer.three) {
+        for (let i = 0; i < terrain.meshes.length; i += 1) {
+          pushMeshPolygons(polygons, terrain.meshes[i], camera, 0);
+        }
       }
       for (let i = 0; i < state.enemies.length; i += 1) {
         const enemy = state.enemies[i];
-        if (enemy.alive && !(renderer.three && NAVAL_KINDS[enemy.kind])) {
+        if (enemy.alive && !(renderer.three && (NAVAL_KINDS[enemy.kind] || THREE_MODEL_KINDS[enemy.kind]))) {
           pushEntityPolygons(polygons, enemy, camera);
         }
       }
@@ -1153,7 +1264,7 @@
         ctx.stroke();
       }
 
-      renderNavalThreeLayer(state.enemies, camera);
+      renderThreeLayer(stage, terrain, state.enemies, camera);
       drawProjectiles(state.projectiles, camera);
       drawParticles(state.particles, camera);
       drawLockMarker(game.targetLock, camera, game.clock);
