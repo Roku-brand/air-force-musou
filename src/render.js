@@ -371,15 +371,20 @@
       };
     }
 
-    function drawSky(environment, player, camera) {
+    function getHorizonY(camera) {
+      const horizonProbe = projectPoint({ x: camera.pos.x + camera.forward.x * 2800, y: 0, z: camera.pos.z + camera.forward.z * 2800 }, camera);
+      const fallback = renderer.height * 0.52;
+      return Math3D.clamp(horizonProbe ? horizonProbe.y : fallback, renderer.height * 0.12, renderer.height * 0.9);
+    }
+
+    function drawSky(environment, player, camera, horizonY) {
       const look = Math3D.clamp(camera.forward.y, -0.95, 0.95);
-      const horizonRatio = Math3D.clamp(0.52 - look * 0.38, 0.14, 0.86);
-      const sky = ctx.createLinearGradient(0, 0, 0, renderer.height);
+      const sky = ctx.createLinearGradient(0, 0, 0, horizonY);
       sky.addColorStop(0, environment.skyTop);
-      sky.addColorStop(Math.max(0.22, horizonRatio), environment.skyBottom);
-      sky.addColorStop(1, environment.seaBottom);
+      sky.addColorStop(0.78, environment.skyBottom);
+      sky.addColorStop(1, environment.haze);
       ctx.fillStyle = sky;
-      ctx.fillRect(0, 0, renderer.width, renderer.height);
+      ctx.fillRect(0, 0, renderer.width, horizonY + 2);
 
       ctx.fillStyle = environment.sunColor;
       ctx.beginPath();
@@ -388,13 +393,10 @@
 
       const hazeOffset = Math.max(-120, Math.min(120, -camera.forward.y * 240));
       ctx.fillStyle = environment.haze;
-      ctx.fillRect(0, renderer.height * horizonRatio - 40 + hazeOffset * 0.2, renderer.width, renderer.height * 0.2);
+      ctx.fillRect(0, horizonY - 40 + hazeOffset * 0.2, renderer.width, renderer.height * 0.2);
     }
 
-    function drawOcean(camera, player, environment) {
-      const horizonProbe = projectPoint({ x: camera.pos.x + camera.forward.x * 2800, y: 0, z: camera.pos.z + camera.forward.z * 2800 }, camera);
-      const horizonY = horizonProbe ? horizonProbe.y : renderer.height * 0.52;
-
+    function drawOcean(camera, player, environment, horizonY) {
       const ocean = ctx.createLinearGradient(0, horizonY, 0, renderer.height);
       ocean.addColorStop(0, environment.seaTop);
       ocean.addColorStop(1, environment.seaBottom);
@@ -660,8 +662,9 @@
       const camera = buildCamera(player);
       const terrain = buildTerrain(stage);
 
-      drawSky(environment, player, camera);
-      drawOcean(camera, player, environment);
+      const horizonY = getHorizonY(camera);
+      drawSky(environment, player, camera, horizonY);
+      drawOcean(camera, player, environment, horizonY);
       drawClouds(terrain.clouds, camera);
 
       const polygons = [];
@@ -722,4 +725,3 @@
     createRenderer: createRenderer
   };
 })();
-
