@@ -10,7 +10,6 @@
     menuOverlay: document.getElementById("menu-overlay"),
     messageOverlay: document.getElementById("message-overlay"),
     missionName: document.getElementById("mission-name"),
-    missionObjective: document.getElementById("mission-objective"),
     lockName: document.getElementById("lock-name"),
     lockDistance: document.getElementById("lock-distance"),
     healthText: document.getElementById("health-text"),
@@ -494,7 +493,6 @@
     const player = game.stageState.player;
     const aliveHostiles = Entities.getAliveEnemies(game);
     dom.missionName.textContent = game.currentStage.shortName;
-    dom.missionObjective.textContent = game.currentStage.objective;
     dom.stageText.textContent = String(game.stageIndex + 1) + " / " + CONFIG.stages.length;
 
     dom.healthText.textContent = player.health + " / " + player.maxHealth;

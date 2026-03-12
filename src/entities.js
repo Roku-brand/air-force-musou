@@ -293,7 +293,7 @@
     const pitchInput = (input.keys.KeyW ? 1 : 0) - (input.keys.KeyS ? 1 : 0);
     const rollInput = (input.keys.KeyA ? 1 : 0) - (input.keys.KeyD ? 1 : 0);
     const yawInput = (input.keys.KeyQ ? 1 : 0) - (input.keys.KeyE ? 1 : 0);
-    const throttleInput = (input.keys.ShiftLeft || input.keys.ShiftRight ? 1 : 0) - (input.keys.ControlLeft || input.keys.ControlRight ? 1 : 0);
+    const boostInput = (input.keys.ShiftLeft || input.keys.ShiftRight ? 1 : 0);
     const verticalInput = (input.keys.ArrowUp ? 1 : 0) - (input.keys.ArrowDown ? 1 : 0);
     const turnInput = (input.keys.ArrowRight ? 1 : 0) - (input.keys.ArrowLeft ? 1 : 0);
 
@@ -305,7 +305,7 @@
 
     const totalYawInput = yawInput + turnInput;
     player.yaw = Math3D.wrapAngle(player.yaw + (totalYawInput * 0.95 - player.roll * 0.48) * dt);
-    player.speed = Math3D.clamp(player.speed + throttleInput * 92 * dt, CONFIG.player.minSpeed, CONFIG.player.maxSpeed);
+    player.speed = Math3D.clamp(player.speed - 56 * dt + boostInput * 132 * dt, CONFIG.player.minSpeed, CONFIG.player.maxSpeed);
 
     const basis = Math3D.basisFromAngles(player.pitch, player.yaw, player.roll);
     player.strafeVelocity = Math3D.lerp(player.strafeVelocity, 0, dt * 5.5);
