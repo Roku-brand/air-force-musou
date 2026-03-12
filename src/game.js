@@ -180,6 +180,12 @@
       return osc;
     }
 
+    const osc = context.createOscillator();
+    const gain = context.createGain();
+
+    osc.connect(gain);
+    gain.connect(output);
+
     if (soundName === "playerMissile") {
       const duration = 0.45;
 
@@ -308,12 +314,6 @@
       createTone("sine", 1046.5 * playbackRate, now + 0.42, now + 1.1, chimeGain, 1174.66 * playbackRate);
       return;
     }
-
-    const osc = context.createOscillator();
-    const gain = context.createGain();
-
-    osc.connect(gain);
-    gain.connect(output);
 
     if (soundName === "playerDown") {
       osc.type = "sawtooth";
