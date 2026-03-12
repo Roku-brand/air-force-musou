@@ -573,6 +573,12 @@
         if (!end) {
           continue;
         }
+
+        if (projectile.kind === "missile") {
+          drawMissileProjectile(projectile, start, end);
+          continue;
+        }
+
         if (start) {
           ctx.strokeStyle = projectile.ownerTeam === "player" ? "rgba(255, 230, 136, 0.75)" : "rgba(255, 134, 110, 0.72)";
           ctx.lineWidth = projectile.kind === "bullet" ? 2 : 4;
@@ -586,6 +592,91 @@
         ctx.arc(end.x, end.y, Math.max(2, projectile.radius * end.scale * 0.2), 0, Math.PI * 2);
         ctx.fill();
       }
+    }
+
+    function drawMissileProjectile(projectile, start, end) {
+      const missileLength = Math.max(12, projectile.radius * end.scale * 1.55);
+      const bodyWidth = Math.max(3.5, projectile.radius * end.scale * 0.28);
+      let dirX = 0;
+      let dirY = -1;
+
+      if (start) {
+        const dx = end.x - start.x;
+        const dy = end.y - start.y;
+        const mag = Math.hypot(dx, dy);
+        if (mag > 0.001) {
+          dirX = dx / mag;
+          dirY = dy / mag;
+        }
+      }
+
+      const perpX = -dirY;
+      const perpY = dirX;
+
+      const noseX = end.x + dirX * missileLength * 0.6;
+      const noseY = end.y + dirY * missileLength * 0.6;
+      const tailX = end.x - dirX * missileLength * 0.68;
+      const tailY = end.y - dirY * missileLength * 0.68;
+
+      if (start) {
+        const glow = ctx.createLinearGradient(tailX, tailY, start.x, start.y);
+        glow.addColorStop(0, projectile.ownerTeam === "player" ? "rgba(255, 196, 98, 0.52)" : "rgba(255, 142, 118, 0.5)");
+        glow.addColorStop(1, "rgba(255, 255, 255, 0)");
+        ctx.strokeStyle = glow;
+        ctx.lineWidth = Math.max(4, bodyWidth * 1.35);
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(tailX, tailY);
+        ctx.lineTo(start.x, start.y);
+        ctx.stroke();
+      }
+
+      const finSpan = bodyWidth * 2.1;
+      const finOffset = missileLength * 0.22;
+      ctx.fillStyle = "rgba(230, 235, 242, 0.92)";
+      ctx.beginPath();
+      ctx.moveTo(tailX + dirX * finOffset + perpX * bodyWidth * 0.5, tailY + dirY * finOffset + perpY * bodyWidth * 0.5);
+      ctx.lineTo(tailX + dirX * (finOffset + bodyWidth * 0.4) + perpX * finSpan, tailY + dirY * (finOffset + bodyWidth * 0.4) + perpY * finSpan);
+      ctx.lineTo(tailX + dirX * (finOffset - bodyWidth * 0.8), tailY + dirY * (finOffset - bodyWidth * 0.8));
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(tailX + dirX * finOffset - perpX * bodyWidth * 0.5, tailY + dirY * finOffset - perpY * bodyWidth * 0.5);
+      ctx.lineTo(tailX + dirX * (finOffset + bodyWidth * 0.4) - perpX * finSpan, tailY + dirY * (finOffset + bodyWidth * 0.4) - perpY * finSpan);
+      ctx.lineTo(tailX + dirX * (finOffset - bodyWidth * 0.8), tailY + dirY * (finOffset - bodyWidth * 0.8));
+      ctx.closePath();
+      ctx.fill();
+
+      const bodyGradient = ctx.createLinearGradient(noseX, noseY, tailX, tailY);
+      bodyGradient.addColorStop(0, "rgba(248, 249, 252, 0.98)");
+      bodyGradient.addColorStop(0.45, "rgba(216, 222, 230, 0.95)");
+      bodyGradient.addColorStop(1, "rgba(168, 176, 188, 0.9)");
+      ctx.strokeStyle = bodyGradient;
+      ctx.lineWidth = bodyWidth;
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(noseX, noseY);
+      ctx.lineTo(tailX, tailY);
+      ctx.stroke();
+
+      const bandX = end.x - dirX * missileLength * 0.15;
+      const bandY = end.y - dirY * missileLength * 0.15;
+      ctx.strokeStyle = "rgba(76, 126, 168, 0.95)";
+      ctx.lineWidth = Math.max(1.5, bodyWidth * 0.42);
+      ctx.beginPath();
+      ctx.moveTo(bandX + perpX * bodyWidth * 0.72, bandY + perpY * bodyWidth * 0.72);
+      ctx.lineTo(bandX - perpX * bodyWidth * 0.72, bandY - perpY * bodyWidth * 0.72);
+      ctx.stroke();
+
+      const engineGlow = ctx.createRadialGradient(tailX, tailY, 0, tailX, tailY, bodyWidth * 2.7);
+      engineGlow.addColorStop(0, projectile.ownerTeam === "player" ? "rgba(255, 234, 170, 0.95)" : "rgba(255, 178, 148, 0.95)");
+      engineGlow.addColorStop(0.5, projectile.ownerTeam === "player" ? "rgba(255, 170, 76, 0.55)" : "rgba(255, 122, 92, 0.5)");
+      engineGlow.addColorStop(1, "rgba(255, 255, 255, 0)");
+      ctx.fillStyle = engineGlow;
+      ctx.beginPath();
+      ctx.arc(tailX, tailY, bodyWidth * 2.7, 0, Math.PI * 2);
+      ctx.fill();
     }
 
     function drawParticles(particles, camera) {
