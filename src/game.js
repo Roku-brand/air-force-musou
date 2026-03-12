@@ -104,7 +104,7 @@
       card.innerHTML = "<h3>" + stage.shortName + "</h3><p>" + stage.objective + "</p><span class=\"stage-tag\">" + stage.completionLabel + "</span>";
       card.addEventListener("click", function () {
         game.selectedStageIndex = index;
-        buildStageCards();
+        showStageBriefing(index);
       });
       dom.stageCards.appendChild(card);
     });
