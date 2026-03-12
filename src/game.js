@@ -6,6 +6,7 @@
 
   const dom = {
     canvas: document.getElementById("game-canvas"),
+    threeCanvas: document.getElementById("three-layer"),
     hud: document.getElementById("hud"),
     menuOverlay: document.getElementById("menu-overlay"),
     messageOverlay: document.getElementById("message-overlay"),
@@ -48,7 +49,7 @@
   };
 
   const game = {
-    renderer: SkyDominion.Renderer.createRenderer(dom.canvas),
+    renderer: SkyDominion.Renderer.createRenderer(dom.canvas, dom.threeCanvas),
     radarContext: dom.radarCanvas.getContext("2d"),
     state: "menu",
     stageIndex: 0,
