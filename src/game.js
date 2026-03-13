@@ -582,7 +582,7 @@
       if (distance > CONFIG.world.radarRange) {
         return;
       }
-      const x = centerX + (side / CONFIG.world.radarRange) * radius;
+      const x = centerX - (side / CONFIG.world.radarRange) * radius;
       const y = centerY - (forward / CONFIG.world.radarRange) * radius;
       ctx.fillStyle = enemy === game.targetLock ? "#ffe17b" : enemy.kind === "fighter" ? "#ff7373" : "#ffb96f";
       ctx.beginPath();
