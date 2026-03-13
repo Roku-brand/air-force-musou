@@ -1064,60 +1064,6 @@
       }
     }
 
-    function drawLockMarker(lock, camera, clock) {
-      if (!lock || !lock.alive) {
-        return;
-      }
-      const lockPoint = getLockAnchorPoint(lock);
-      if (!lockPoint) {
-        return;
-      }
-      const projected = projectPoint(lockPoint, camera);
-      if (!projected) {
-        return;
-      }
-      const size = Math.max(24, 320 / projected.z * 34);
-      const pulse = 0.65 + Math.sin(clock * 12) * 0.35;
-
-      ctx.strokeStyle = "rgba(255, 232, 126, 0.98)";
-      ctx.lineWidth = 2.6;
-      ctx.beginPath();
-      ctx.moveTo(projected.x - size, projected.y - size * 0.65);
-      ctx.lineTo(projected.x - size * 0.4, projected.y - size * 0.65);
-      ctx.lineTo(projected.x - size * 0.4, projected.y - size);
-      ctx.moveTo(projected.x + size, projected.y - size * 0.65);
-      ctx.lineTo(projected.x + size * 0.4, projected.y - size * 0.65);
-      ctx.lineTo(projected.x + size * 0.4, projected.y - size);
-      ctx.moveTo(projected.x - size, projected.y + size * 0.65);
-      ctx.lineTo(projected.x - size * 0.4, projected.y + size * 0.65);
-      ctx.lineTo(projected.x - size * 0.4, projected.y + size);
-      ctx.moveTo(projected.x + size, projected.y + size * 0.65);
-      ctx.lineTo(projected.x + size * 0.4, projected.y + size * 0.65);
-      ctx.lineTo(projected.x + size * 0.4, projected.y + size);
-      ctx.stroke();
-
-      ctx.strokeStyle = "rgba(255, 90, 90, " + (0.5 + pulse * 0.45) + ")";
-      ctx.lineWidth = 1.8;
-      ctx.beginPath();
-      ctx.arc(projected.x, projected.y, size * (0.42 + pulse * 0.12), 0, Math.PI * 2);
-      ctx.stroke();
-
-      ctx.strokeStyle = "rgba(255, 239, 170, 0.84)";
-      ctx.beginPath();
-      ctx.moveTo(projected.x - size * 0.24, projected.y);
-      ctx.lineTo(projected.x + size * 0.24, projected.y);
-      ctx.moveTo(projected.x, projected.y - size * 0.24);
-      ctx.lineTo(projected.x, projected.y + size * 0.24);
-      ctx.stroke();
-
-      ctx.fillStyle = "rgba(16, 18, 22, 0.66)";
-      ctx.fillRect(projected.x - 34, projected.y - size - 22, 68, 16);
-      ctx.fillStyle = "rgba(255, 224, 130, 0.95)";
-      ctx.font = "bold 11px sans-serif";
-      ctx.textAlign = "center";
-      ctx.fillText("LOCK", projected.x, projected.y - size - 10);
-    }
-
     function syncThreeCamera(cameraBasis) {
       if (!renderer.three) {
         return;
@@ -1284,7 +1230,6 @@
       renderThreeLayer(stage, terrain, state.enemies, camera);
       drawProjectiles(state.projectiles, camera);
       drawParticles(state.particles, camera);
-      drawLockMarker(game.targetLock, camera, game.clock);
     }
 
     return {

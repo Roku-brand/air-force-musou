@@ -157,7 +157,6 @@
       return false;
     }
 
-    const lock = acquireTargetLock(game);
     const basis = Math3D.basisFromAngles(player.pitch, player.yaw, player.roll);
     const muzzle = Math3D.add(player.pos, Math3D.add(Math3D.scale(basis.forward, 28), Math3D.scale(basis.right, 6)));
     state.projectiles.push(createProjectile({
@@ -170,8 +169,8 @@
       damage: CONFIG.player.missileDamage,
       life: 6.2,
       radius: 10,
-      targetId: lock ? lock.id : null,
-      turnRate: 3.8,
+      targetId: null,
+      turnRate: 0,
       color: "#ffe690",
       glow: 18
     }));
@@ -530,38 +529,6 @@
     }
   }
 
-  function acquireTargetLock(game) {
-    const player = game.stageState.player;
-    const basis = Math3D.basisFromAngles(player.pitch, player.yaw, player.roll);
-    let best = null;
-    let bestScore = -Infinity;
-
-    for (let i = 0; i < game.stageState.enemies.length; i += 1) {
-      const enemy = game.stageState.enemies[i];
-      if (!enemy.alive) {
-        continue;
-      }
-      const offset = Math3D.sub(enemy.pos, player.pos);
-      const distance = Math3D.length(offset);
-      const alignment = Math3D.dot(Math3D.normalize(offset), basis.forward);
-      if (distance > CONFIG.targeting.maxLockDistance || alignment < CONFIG.targeting.minAlignment) {
-        continue;
-      }
-      const predictedEnemyPos = Math3D.add(enemy.pos, Math3D.scale(Math3D.sub(enemy.pos, enemy.prevPos), CONFIG.targeting.leadTime));
-      const predictedOffset = Math3D.sub(predictedEnemyPos, player.pos);
-      const predictedAlignment = Math3D.dot(Math3D.normalize(predictedOffset), basis.forward);
-      const baseScore = predictedAlignment * 2.45 - distance / (CONFIG.targeting.maxLockDistance * 0.82);
-      const stickyBonus = game.targetLock && game.targetLock.id === enemy.id ? CONFIG.targeting.lockStickinessBonus : 0;
-      const score = baseScore + stickyBonus;
-      if (score > bestScore) {
-        bestScore = score;
-        best = enemy;
-      }
-    }
-
-    return best;
-  }
-
   function getAliveEnemies(game) {
     return game.stageState.enemies.filter(function (enemy) {
       return enemy.alive;
@@ -665,7 +632,6 @@
   SkyDominion.Entities = {
     createStageState,
     firePlayerMissile,
-    acquireTargetLock,
     update,
     getAliveEnemies
   };
