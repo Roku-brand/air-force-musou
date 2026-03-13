@@ -294,7 +294,7 @@
     const yawInput = (input.keys.KeyQ ? 1 : 0) - (input.keys.KeyE ? 1 : 0);
     const boostInput = (input.keys.ShiftLeft || input.keys.ShiftRight ? 1 : 0);
     const verticalInput = (input.keys.ArrowUp ? 1 : 0) - (input.keys.ArrowDown ? 1 : 0);
-    const turnInput = (input.keys.ArrowLeft ? 1 : 0) - (input.keys.ArrowRight ? 1 : 0);
+    const turnInput = (input.keys.ArrowRight ? 1 : 0) - (input.keys.ArrowLeft ? 1 : 0);
 
     player.pitch = Math3D.clamp(player.pitch + pitchInput * dt * 0.9, -0.62, 0.62);
     player.roll = Math3D.clamp(player.roll + rollInput * dt * 1.8, -1.15, 1.15);
