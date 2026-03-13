@@ -39,6 +39,7 @@ button {
   position: relative;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
 }
 
@@ -79,6 +80,7 @@ body.menu-active #hud {
 .top-page-panel {
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   max-width: none;
   border: none;
   box-shadow: none;
@@ -132,6 +134,7 @@ body.menu-active #hud {
   .top-page-panel {
     grid-template-rows: auto auto auto auto 1fr;
     padding: 10px;
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
   }
 
   .lead {
@@ -156,16 +159,16 @@ body.menu-active #hud {
   }
 
   .menu-section {
-    padding: 8px;
+    padding: 6px;
   }
 
   .stage-card {
-    padding: 8px 10px;
+    padding: 6px 8px;
   }
 
   .stage-card-visual {
-    height: 88px;
-    margin-bottom: 8px;
+    height: 66px;
+    margin-bottom: 6px;
   }
 
   .enemy-warship {
@@ -174,8 +177,8 @@ body.menu-active #hud {
   }
 
   .stage-card h3 {
-    font-size: 16px;
-    margin-bottom: 3px;
+    font-size: 15px;
+    margin-bottom: 2px;
   }
 
   .stage-card p,
@@ -193,8 +196,8 @@ body.menu-active #hud {
   }
 
   .stage-card .stage-tag {
-    margin-top: 6px;
-    padding: 3px 7px;
+    margin-top: 4px;
+    padding: 2px 6px;
     font-size: 10px;
   }
 
