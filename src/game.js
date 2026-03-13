@@ -11,8 +11,6 @@
     menuOverlay: document.getElementById("menu-overlay"),
     messageOverlay: document.getElementById("message-overlay"),
     missionName: document.getElementById("mission-name"),
-    lockName: document.getElementById("lock-name"),
-    lockDistance: document.getElementById("lock-distance"),
     healthText: document.getElementById("health-text"),
     ammoText: document.getElementById("ammo-text"),
     speedText: document.getElementById("speed-text"),
@@ -56,7 +54,6 @@
     selectedStageIndex: 0,
     currentStage: CONFIG.stages[0],
     stageState: Entities.createStageState(CONFIG.stages[0]),
-    targetLock: null,
     clock: 0,
     lastFrameTime: 0,
     feedback: {
@@ -74,7 +71,6 @@
       aircraftColor: "standard",
       aircraftFrame: "balanced"
     },
-    previousLockId: null,
     input: {
       keys: {},
       keyboardKeys: {},
@@ -220,17 +216,6 @@
       clickGain.connect(clickFilter);
       clickFilter.connect(output);
       createNoiseSource(0.07, clickGain, { color: "white" });
-      return;
-    }
-
-    if (soundName === "targetLock") {
-      osc.type = "square";
-      osc.frequency.setValueAtTime(880 * playbackRate, now);
-      gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.exponentialRampToValueAtTime(volume, now + 0.012);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
-      osc.start(now);
-      osc.stop(now + 0.1);
       return;
     }
 
@@ -404,13 +389,11 @@
     game.selectedStageIndex = index;
     game.currentStage = CONFIG.stages[index];
     game.stageState = Entities.createStageState(game.currentStage);
-    game.targetLock = null;
     game.feedback.hitFlash = 0;
     game.input.fireQueued = false;
     game.input.keys = {};
     game.input.keyboardKeys = {};
     game.input.virtualKeys = {};
-    game.previousLockId = null;
 
     const frame = FRAME_PRESETS[game.settings.aircraftFrame] || FRAME_PRESETS.balanced;
     game.stageState.player.maxHealth = frame.maxHealth;
@@ -529,15 +512,6 @@
     dom.altitudeText.textContent = Math.round(player.pos.y).toString();
     dom.hostilesText.textContent = aliveHostiles.length.toString();
 
-    if (game.targetLock) {
-      const distance = Math.round(Math3D.distance(player.pos, game.targetLock.pos));
-      dom.lockName.textContent = game.targetLock.name;
-      dom.lockDistance.textContent = distance + " m";
-    } else {
-      dom.lockName.textContent = "ロックなし";
-      dom.lockDistance.textContent = "---";
-    }
-
     dom.hitFlash.classList.toggle("active", game.feedback.hitFlash > 0);
   }
 
@@ -584,7 +558,7 @@
       }
       const x = centerX - (side / CONFIG.world.radarRange) * radius;
       const y = centerY - (forward / CONFIG.world.radarRange) * radius;
-      ctx.fillStyle = enemy === game.targetLock ? "#ffe17b" : enemy.kind === "fighter" ? "#ff7373" : "#ffb96f";
+      ctx.fillStyle = enemy.kind === "fighter" ? "#ff7373" : "#ffb96f";
       ctx.beginPath();
       ctx.arc(x, y, enemy.kind === "fighter" ? 3 : 4.6, 0, Math.PI * 2);
       ctx.fill();
@@ -929,14 +903,7 @@
         Entities.firePlayerMissile(game);
         game.input.fireQueued = false;
       }
-      game.targetLock = Entities.acquireTargetLock(game);
       const result = Entities.update(game, dt);
-      game.targetLock = Entities.acquireTargetLock(game);
-      const lockId = game.targetLock ? game.targetLock.id : null;
-      if (lockId && lockId !== game.previousLockId) {
-        playSound("targetLock", { volume: 0.12 });
-      }
-      game.previousLockId = lockId;
       updateHud();
       updateRadar();
       if (result.finished) {

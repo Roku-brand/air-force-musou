@@ -90,12 +90,6 @@
       cockpitForward: 10,
       cockpitHeight: 6
     },
-    targeting: {
-      maxLockDistance: 2200,
-      minAlignment: 0.62,
-      leadTime: 0.55,
-      lockStickinessBonus: 0.28
-    },
     world: {
       ceiling: 920,
       floor: 0,

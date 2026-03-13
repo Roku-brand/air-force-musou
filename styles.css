@@ -275,14 +275,6 @@ body.menu-active #hud {
   text-overflow: ellipsis;
 }
 
-.lock-panel {
-  position: absolute;
-  left: 50%;
-  top: 0;
-  transform: translateX(-50%);
-  min-width: 250px;
-  text-align: center;
-}
 
 .instrument-panel {
   min-width: 210px;
@@ -969,10 +961,6 @@ body.menu-active #hud {
     width: auto;
   }
 
-  .lock-panel {
-    min-width: 180px;
-    padding: 8px 10px;
-  }
 
   .instrument-panel {
     min-width: 132px;
