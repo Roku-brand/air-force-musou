@@ -6,7 +6,6 @@
   const terrainCache = {};
   const NAVAL_KINDS = { battleship: true, carrier: true, flagship: true };
   const THREE_MODEL_KINDS = { fighter: true, sam: true, hq: true };
-  const lockAnchorOffsetCache = {};
 
   const MODELS = {
     player: {
@@ -316,41 +315,13 @@
     }
   };
 
-  function getModelLockAnchorOffset(kind) {
-    if (lockAnchorOffsetCache[kind] != null) {
-      return lockAnchorOffsetCache[kind];
-    }
-    const model = MODELS[kind];
-    if (!model || !model.vertices || !model.vertices.length) {
-      lockAnchorOffsetCache[kind] = 0;
-      return 0;
-    }
-    let minY = Infinity;
-    let maxY = -Infinity;
-    for (let i = 0; i < model.vertices.length; i += 1) {
-      const y = model.vertices[i][1] * (model.scale || 1);
-      if (y < minY) {
-        minY = y;
-      }
-      if (y > maxY) {
-        maxY = y;
-      }
-    }
-    const anchorOffset = (minY + maxY) * 0.5;
-    lockAnchorOffsetCache[kind] = anchorOffset;
-    return anchorOffset;
-  }
-
   function getLockAnchorPoint(entity) {
     if (!entity || !entity.pos) {
       return null;
     }
-    const kind = entity.kind;
-    const anchorOffsetY = getModelLockAnchorOffset(kind);
-    const navalBias = NAVAL_KINDS[kind] ? 0.4 : 0;
     return {
       x: entity.pos.x,
-      y: entity.pos.y + anchorOffsetY + navalBias,
+      y: entity.pos.y,
       z: entity.pos.z
     };
   }
