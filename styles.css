@@ -1021,3 +1021,61 @@ body.menu-active #hud {
   box-shadow: inset 0 0 0 1px rgba(255, 225, 123, 0.3);
   background: linear-gradient(180deg, rgba(255, 225, 123, 0.14), rgba(121, 224, 255, 0.06));
 }
+
+
+/* Target acquisition HUD */
+.target-lock {
+  position: absolute;
+  z-index: 12;
+  width: 112px;
+  height: 82px;
+  transform: translate(-50%, -50%);
+  color: #ffe17b;
+  text-align: center;
+  filter: drop-shadow(0 0 8px rgba(255, 225, 123, 0.4));
+  transition: left 70ms linear, top 70ms linear, opacity 120ms ease;
+}
+.target-lock::before {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  border: 1px solid rgba(255, 225, 123, 0.32);
+  border-radius: 50%;
+}
+.target-lock-corner {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-color: #ffe17b;
+  border-style: solid;
+}
+.target-lock-tl { left: 0; top: 0; border-width: 2px 0 0 2px; }
+.target-lock-tr { right: 0; top: 0; border-width: 2px 2px 0 0; }
+.target-lock-bl { left: 0; bottom: 0; border-width: 0 0 2px 2px; }
+.target-lock-br { right: 0; bottom: 0; border-width: 0 2px 2px 0; }
+.target-lock strong,
+.target-lock > span:last-child {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  padding: 2px 5px;
+  background: rgba(3, 12, 22, 0.72);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+.target-lock strong { top: -20px; }
+.target-lock > span:last-child { bottom: -20px; color: #ecfbff; }
+.target-arrow {
+  position: absolute;
+  z-index: 12;
+  left: 50%;
+  top: 50%;
+  color: #ffcf69;
+  font-size: 24px;
+  transform-origin: 50% 50%;
+  filter: drop-shadow(0 0 7px rgba(255, 170, 70, 0.75));
+}
+@media (max-width: 900px) {
+  .target-lock { width: 86px; height: 62px; }
+}
