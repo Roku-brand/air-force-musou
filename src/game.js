@@ -18,6 +18,10 @@
     hostilesText: document.getElementById("hostiles-text"),
     stageText: document.getElementById("stage-text"),
     hitFlash: document.getElementById("hit-flash"),
+    targetLock: document.getElementById("target-lock"),
+    targetName: document.getElementById("target-name"),
+    targetDistance: document.getElementById("target-distance"),
+    targetArrow: document.getElementById("target-arrow"),
     messageEyebrow: document.getElementById("message-eyebrow"),
     messageTitle: document.getElementById("message-title"),
     messageBody: document.getElementById("message-body"),
@@ -58,6 +62,10 @@
     lastFrameTime: 0,
     feedback: {
       hitFlash: 0
+    },
+    targeting: {
+      targetId: null,
+      distance: 0
     },
     audio: {
       context: null,
@@ -390,6 +398,8 @@
     game.currentStage = CONFIG.stages[index];
     game.stageState = Entities.createStageState(game.currentStage);
     game.feedback.hitFlash = 0;
+    game.targeting.targetId = null;
+    game.targeting.distance = 0;
     game.input.fireQueued = false;
     game.input.keys = {};
     game.input.keyboardKeys = {};
@@ -497,6 +507,84 @@
         }
       });
     }
+  }
+
+
+  function updateTargeting() {
+    const player = game.stageState.player;
+    const enemies = Entities.getAliveEnemies(game);
+    const basis = Math3D.basisFromAngles(player.pitch, player.yaw, player.roll);
+    let target = enemies.find(function (enemy) {
+      return enemy.id === game.targeting.targetId;
+    }) || null;
+
+    if (target) {
+      const offset = Math3D.sub(target.pos, player.pos);
+      const distance = Math3D.length(offset);
+      const facing = Math3D.dot(Math3D.normalize(offset), basis.forward);
+      if (distance > 5200 || facing < -0.35) {
+        target = null;
+      }
+    }
+
+    if (!target) {
+      let bestScore = -Infinity;
+      enemies.forEach(function (enemy) {
+        const offset = Math3D.sub(enemy.pos, player.pos);
+        const distance = Math3D.length(offset);
+        const direction = Math3D.normalize(offset);
+        const facing = Math3D.dot(direction, basis.forward);
+        const score = facing - distance / 14000;
+        if (facing > 0.18 && distance < 5200 && score > bestScore) {
+          target = enemy;
+          bestScore = score;
+        }
+      });
+    }
+
+    game.targeting.targetId = target ? target.id : null;
+    if (!target) {
+      dom.targetLock.classList.add("hidden");
+      dom.targetArrow.classList.add("hidden");
+      return;
+    }
+
+    const offset = Math3D.sub(target.pos, player.pos);
+    const distance = Math3D.length(offset);
+    game.targeting.distance = distance;
+    dom.targetName.textContent = target.name || "TARGET";
+    dom.targetDistance.textContent = Math.round(distance) + " m";
+
+    const projected = game.renderer.projectPointForUi(target.pos, player);
+    const margin = 72;
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const onScreen = projected
+      && projected.x >= margin && projected.x <= width - margin
+      && projected.y >= margin && projected.y <= height - margin;
+
+    if (onScreen) {
+      dom.targetLock.style.left = projected.x + "px";
+      dom.targetLock.style.top = projected.y + "px";
+      dom.targetLock.classList.remove("hidden");
+      dom.targetArrow.classList.add("hidden");
+      return;
+    }
+
+    dom.targetLock.classList.add("hidden");
+    const side = Math3D.dot(offset, basis.right);
+    const vertical = Math3D.dot(offset, basis.up);
+    const forward = Math3D.dot(offset, basis.forward);
+    const angle = Math.atan2(side, -vertical || -0.001);
+    const radiusX = Math.max(70, width * 0.42);
+    const radiusY = Math.max(55, height * 0.36);
+    const x = width * 0.5 + Math.sin(angle) * radiusX;
+    const y = height * 0.5 - Math.cos(angle) * radiusY;
+    dom.targetArrow.style.left = Math3D.clamp(x, 42, width - 42) + "px";
+    dom.targetArrow.style.top = Math3D.clamp(y, 42, height - 42) + "px";
+    dom.targetArrow.style.transform = "translate(-50%, -50%) rotate(" + (angle * 180 / Math.PI) + "deg)";
+    dom.targetArrow.style.opacity = forward < 0 ? "0.7" : "1";
+    dom.targetArrow.classList.remove("hidden");
   }
 
   function updateHud() {
@@ -904,12 +992,15 @@
         game.input.fireQueued = false;
       }
       const result = Entities.update(game, dt);
+      updateTargeting();
       updateHud();
       updateRadar();
       if (result.finished) {
         handleMissionEnd(result);
       }
     } else {
+      dom.targetLock.classList.add("hidden");
+      dom.targetArrow.classList.add("hidden");
       updateHud();
       updateRadar();
     }

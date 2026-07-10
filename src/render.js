@@ -437,14 +437,27 @@
       powerPreference: "high-performance"
     });
     renderer.setClearColor(0x000000, 0);
+    if ("outputColorSpace" in renderer && THREE.SRGBColorSpace) {
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+    }
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.05;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(48, 1, 1, 6800);
 
     const hemi = new THREE.HemisphereLight(0xb8deff, 0x1a2a34, 0.72);
     scene.add(hemi);
-    const sun = new THREE.DirectionalLight(0xfff2d6, 0.88);
-    sun.position.set(180, 260, -240);
+    const sun = new THREE.DirectionalLight(0xfff2d6, 1.08);
+    sun.position.set(180, 520, -240);
+    sun.castShadow = true;
+    sun.shadow.mapSize.set(1024, 1024);
+    sun.shadow.camera.left = -1800;
+    sun.shadow.camera.right = 1800;
+    sun.shadow.camera.top = 1800;
+    sun.shadow.camera.bottom = -1800;
     scene.add(sun);
 
     return {
@@ -1085,6 +1098,106 @@
       threeCam.lookAt(target);
     }
 
+
+    function addStageDetailThree(stage, root) {
+      const threeState = renderer.three;
+      const THREE = threeState.THREE;
+      const terrain = stage.environment.terrainType;
+
+      function material(color, roughness, metalness, emissive) {
+        const mat = new THREE.MeshStandardMaterial({
+          color: color,
+          roughness: roughness == null ? 0.82 : roughness,
+          metalness: metalness == null ? 0.08 : metalness
+        });
+        if (emissive) {
+          mat.emissive = new THREE.Color(emissive);
+          mat.emissiveIntensity = 0.85;
+        }
+        return mat;
+      }
+      function mesh(geometry, mat, x, y, z, cast, receive) {
+        const item = new THREE.Mesh(geometry, mat);
+        item.position.set(x, y, z);
+        item.castShadow = cast !== false;
+        item.receiveShadow = receive !== false;
+        root.add(item);
+        return item;
+      }
+      function box(x, y, z, w, h, d, color, mat) {
+        return mesh(new THREE.BoxGeometry(w, h, d), mat || material(color), x, y + h * 0.5, z);
+      }
+      function tower(x, z, height) {
+        const mast = mesh(new THREE.CylinderGeometry(3, 5, height, 10), material(0x8997a3, 0.42, 0.72), x, height * 0.5, z);
+        const beacon = mesh(new THREE.SphereGeometry(7, 12, 8), material(0xff5533, 0.25, 0.25, 0xff2200), x, height + 5, z, false, false);
+        beacon.castShadow = false;
+        return mast;
+      }
+
+      if (terrain === "archipelago") {
+        const rock = material(0x606853, 0.98, 0);
+        const green = material(0x385b3b, 0.96, 0);
+        [[-1100,1620,250,150],[980,1880,270,170],[160,2460,340,210]].forEach(function (p) {
+          const base = mesh(new THREE.CylinderGeometry(p[2] * 0.58, p[2], p[3], 11), rock, p[0], p[3] * 0.46, p[1]);
+          base.rotation.y = p[0] * 0.001;
+          mesh(new THREE.CylinderGeometry(p[2] * 0.42, p[2] * 0.58, 24, 12), green, p[0], p[3] + 3, p[1]);
+        });
+        box(110, 28, 2380, 150, 12, 110, 0x8a8d83);
+        tower(145, 2390, 58);
+        for (let i = 0; i < 18; i += 1) {
+          const x = -1260 + (i * 173) % 2450;
+          const z = 1320 + (i * 257) % 1250;
+          mesh(new THREE.ConeGeometry(12 + i % 4 * 3, 42 + i % 5 * 7, 7), green, x, 35, z);
+        }
+        threeState.scene.fog = new THREE.FogExp2(0xaab8bd, 0.00013);
+      } else if (terrain === "open-ocean") {
+        const buoyMat = material(0xe15b37, 0.5, 0.28);
+        [[-520,1120],[540,1280],[-780,1760],[720,2080]].forEach(function (p) {
+          mesh(new THREE.CylinderGeometry(7, 10, 22, 10), buoyMat, p[0], 10, p[1]);
+          mesh(new THREE.SphereGeometry(4, 10, 8), material(0xffaa55, 0.3, 0.1, 0xff6600), p[0], 24, p[1], false, false);
+        });
+        const wakeMat = new THREE.MeshBasicMaterial({ color: 0xd8f2ff, transparent: true, opacity: 0.22, depthWrite: false });
+        [[-860,1080,220],[860,1080,260],[-340,1420,180],[340,1420,180],[0,1880,330]].forEach(function (p) {
+          const wake = mesh(new THREE.PlaneGeometry(22, p[2]), wakeMat, p[0], 1.2, p[1] - p[2] * 0.45, false, false);
+          wake.rotation.x = -Math.PI * 0.5;
+        });
+        threeState.scene.fog = new THREE.FogExp2(0xa9bfd0, 0.00011);
+      } else if (terrain === "mountain") {
+        const stone = material(0x566050, 0.98, 0);
+        const snow = material(0xd9e0df, 0.92, 0);
+        [[0,1880,420,360],[-520,1260,260,235],[520,1260,260,235],[-820,2050,230,210],[820,2100,250,230]].forEach(function (p) {
+          mesh(new THREE.ConeGeometry(p[2], p[3], 8), stone, p[0], p[3] * 0.5, p[1]);
+          if (p[3] > 250) mesh(new THREE.ConeGeometry(p[2] * 0.34, p[3] * 0.25, 8), snow, p[0], p[3] * 0.89, p[1]);
+        });
+        box(-120, 42, 1810, 190, 36, 130, 0x59636a);
+        box(120, 42, 1810, 190, 36, 130, 0x59636a);
+        const runway = box(0, 5, 1660, 620, 5, 95, 0x2d3236);
+        runway.material = material(0x2d3236, 0.94, 0.02);
+        tower(0, 1940, 82);
+        mesh(new THREE.SphereGeometry(28, 18, 12, 0, Math.PI * 2, 0, Math.PI * 0.52), material(0xdfe8eb, 0.34, 0.18), 0, 103, 1940);
+        threeState.scene.fog = new THREE.FogExp2(0xb3b8bd, 0.00017);
+      } else if (terrain === "metropolis") {
+        const roadMat = material(0x252a30, 0.94, 0.03);
+        for (let row = 0; row < 5; row += 1) {
+          for (let col = 0; col < 6; col += 1) {
+            const x = -850 + col * 340 + (row % 2) * 35;
+            const z = 980 + row * 350;
+            const h = 150 + ((row * 71 + col * 47) % 250);
+            const facade = material((row + col) % 2 ? 0x4d5863 : 0x596774, 0.58, 0.22);
+            const building = box(x, 5, z, 150, h, 145, 0x56616d, facade);
+            if ((row + col) % 3 === 0) tower(x, z, h + 48);
+            for (let w = -45; w <= 45; w += 30) {
+              const light = box(x + w, h * 0.38, z - 73, 12, 7, 2, 0xffd58a, material(0x7f7359, 0.5, 0.05, 0xffc35a));
+              light.castShadow = false;
+            }
+          }
+        }
+        [-170,170].forEach(function (x) { box(x, 3, 1680, 44, 4, 2100, 0x252a30, roadMat); });
+        [1120,1470,1820,2170].forEach(function (z) { box(0, 3, z, 1900, 4, 42, 0x252a30, roadMat); });
+        threeState.scene.fog = new THREE.FogExp2(0x9ba9b3, 0.0002);
+      }
+    }
+
     function syncTerrainThreeLayer(stage, terrain) {
       if (!renderer.three) {
         return;
@@ -1098,8 +1211,16 @@
       }
       const root = new threeState.THREE.Group();
       for (let i = 0; i < terrain.meshes.length; i += 1) {
-        root.add(createTerrainMeshGroup(threeState, terrain.meshes[i]));
+        const terrainMesh = createTerrainMeshGroup(threeState, terrain.meshes[i]);
+        terrainMesh.traverse(function (child) {
+          if (child.isMesh) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+          }
+        });
+        root.add(terrainMesh);
       }
+      addStageDetailThree(stage, root);
       threeState.scene.add(root);
       threeState.terrainRoot = root;
       threeState.terrainStageId = stage.id;
