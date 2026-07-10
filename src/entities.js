@@ -169,8 +169,8 @@
       damage: CONFIG.player.missileDamage,
       life: 6.2,
       radius: 10,
-      targetId: null,
-      turnRate: 0,
+      targetId: game.targeting ? game.targeting.targetId : null,
+      turnRate: game.targeting && game.targeting.targetId ? 1.25 : 0,
       color: "#ffe690",
       glow: 18
     }));
